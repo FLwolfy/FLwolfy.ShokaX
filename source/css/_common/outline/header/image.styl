@@ -4,7 +4,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 70vh;
+  height: 100vh;
   min-height: 25rem;
   z-index: -9;
   background-color: #363636;
@@ -35,14 +35,15 @@
     background-repeat: no-repeat;
     opacity: 0;
     z-index: 0;
-    animation: imageAnimation 36s linear infinite 0s;
+    animation: imageAnimation 60s linear infinite 0s;
     backface-visibility: hidden;
     transform-style: preserve-3d;
   }
 
+  // 动态设置每个 item 的延迟，确保顺序切换
   for num in (1 .. 6) {
-    .item:nth-child({num+1}) {
-      animation-delay: unit(num * 6, 's');
+    .item:nth-child({num}) {
+      animation-delay: unit((num - 1) * 10, 's'); // 每张 10s
     }
   }
 
@@ -58,28 +59,53 @@
     z-index: $zindex-1;
     the-transition();
   }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+
+    /* 叠加暗角效果 */
+    background: radial-gradient(circle at center,
+      rgba(0, 0, 0, 0) 70%,   /* 中心透明 */
+      rgba(0, 0, 0, 0.6) 100% /* 边缘变暗 */
+    );
+
+    /* 如果还要保留你的点阵，就叠加两层 */
+    background-size: 3px 3px, cover;
+    background-image:
+      radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 0.5px),
+      radial-gradient(circle at center, rgba(0,0,0,0) 70%, rgba(0,0,0,0.6) 100%);
+  }
 }
 
+// keyframes 同时控制透明度和缩放
 @keyframes imageAnimation {
-  0% {
-      opacity: 0;
-      animation-timing-function: ease-in;
+  0% { 
+    opacity: 0; 
+    transform: scale(1); 
+    animation-timing-function: ease-in;
   }
-  2% {
-      opacity: 1;
+  5% { 
+    opacity: 1; 
+    transform: scale(1.05); 
   }
-  8% {
-      opacity: 1;
-      transform: scale(1.05);
-      animation-timing-function: ease-out;
+  16.67% { 
+    opacity: 1; 
+    transform: scale(1.1667);
+    animation-timing-function: ease-out;
   }
-  17% {
-      opacity: 1;
-      transform: scale(1.1);
+  21.67% { 
+    opacity: 0; 
+    transform: scale(1.2167); 
   }
-  25% {
-      opacity: 0;
-      transform: scale(1.1);
+  100% { 
+    opacity: 0; 
+    transform: scale(1); 
   }
-  100% { opacity: 0 }
 }

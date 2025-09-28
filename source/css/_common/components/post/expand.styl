@@ -46,6 +46,7 @@
   h6 {
     position: relative;
     padding-top: .625rem;
+    color: var(--text-heading-color);
 
     &:hover .anchor {
       &::before, &::after {
@@ -54,26 +55,109 @@
     }
   }
 
+  /* ========== 具体标题样式自定义 ========== */
+
+  /* == H1 == */
+  h1 {
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .anchor::before {
+      content: "⚠️" !important;
+    }
+  }
+
+  h1::before,
   h1::after {
     content: "";
-    display: block;
-    box-sizing: unset;
-    width: 100%;
-    height: .0625rem;
-    background: var(--grey-3);
-    padding-right: 1.25rem;
-    margin-left: -1.25rem;
-    margin-top: .3125rem;
+    flex-grow: 1;
+    height: 0.75rem;
+    opacity: 0.4;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--primary-color),
+      var(--primary-color) 0.5rem,
+      transparent 0.5rem,
+      transparent 1rem
+    );
+    background-size: 100% 100%;
   }
+  h1::before {
+    margin-right: 1rem;
+  }
+  h1::after {
+    margin-left: 1rem;
+  }
+
+  /* == H2 == */
+  h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  h2::before,
+  h2::after {
+    content: "";
+    flex-grow: 1;
+    border-top: 0.125rem solid var(--color-grey);
+    opacity: 0.4;
+  }
+  h2::before {
+    margin-right: 1rem;
+  }
+  h2::after {
+    margin-left: 1rem;
+  }
+
+  /* == H3 == */
+  h3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  h3::before,
+  h3::after {
+    color: var(--color-grey);
+    display: inline-block;
+    opacity: 0.4;
+  }
+  h3::before {
+    content: "༺";
+    margin-right: 0.5rem;
+  }
+  h3::after {
+    content: "༻";
+    margin-left: 0.5rem;
+  }
+
+  /* == H4 == */
+  h4 {
+    &::after {
+      color: var(--color-grey);
+      content: "≻꧂";
+      margin-left: 0.25rem;
+      opacity: 0.4;
+    }
+  }
+
+  /* ===================================== */
 
   .anchor {
     border-bottom-style: none;
     color: var(--grey-4);
-    float: right;
+
+    text-align: right;
+    position: absolute;
+    align-items: center; 
+    width: 100%;
     margin-left: .625rem;
+    right: 0;
+    margin-right: -1.5rem;
 
     &:hover {
-      color: inherit;
+      color: var(--grey-9);
     }
   }
 
@@ -81,7 +165,9 @@
   .anchor::after {
     color: var(--grey-4);
     position: absolute;
+    top: 10% !important;
     font-weight: normal;
+    margin-left: -2rem;
     the-transition(, ease-out);
   }
 
@@ -187,6 +273,54 @@
   s {
     color: var(--grey-5);
     text-decoration-color: var(--note-hover, var(--grey-5));
+  }
+
+  code {
+    background-color: var(--grey-3);
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-family: inherit;     // 保持和正文一致，也可以换成等宽字体
+    color: inherit;           // 保持文字颜色和正文一致
+  }
+
+  img {
+    width: auto;
+    display: block;
+    object-fit: cover;
+
+    background: var(--grey-4);
+    border: 0.3rem solid var(--color-grey); /* 单元格线条加粗 */
+    padding: 0.7rem 0.7rem;                /* 给点内边距，不会太挤 */
+
+    /* 禁用 hover 遮罩 */
+    opacity: 1 !important;
+    filter: none !important;
+    transition: none !important;
+    :hover {
+      opacity: 1 !important;
+      filter: none !important;
+    }
+  }
+
+  table {
+    width: auto;
+    margin-left: auto;  /* 水平居中 */
+    margin-right: auto;
+    border-collapse: collapse;              /* 合并边框 */
+    border: 0.3rem solid var(--color-grey); /* 外框加粗 */
+
+    img {
+      min-height: 14rem;
+      max-height: 14rem;
+      border: 0;
+      padding: 0;
+    }
+  }
+  table th,
+  table td {
+    background: var(--grey-4);
+    border: 0.3rem solid var(--color-grey); /* 单元格线条加粗 */
+    padding: 0.7rem 0.7rem;                /* 给点内边距，不会太挤 */
   }
 
   ruby {

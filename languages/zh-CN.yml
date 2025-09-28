@@ -42,6 +42,9 @@ index:
   random_posts: 随机文章
   recent_comments: 最新评论
 
+archive:
+  title: 文章储物柜
+
 post:
   posted: 发表于
   edited: 更新于

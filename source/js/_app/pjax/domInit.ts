@@ -8,7 +8,8 @@ import {
   showContents,
   siteHeader,
   siteNav,
-  toolBtn
+  toolBtn,
+  indexImgs
 } from '../globals/globalVars'
 import { Loader } from '../globals/thirdparty'
 import { createChild } from '../library/proto'
@@ -25,6 +26,18 @@ export default async function domInit () {
 
   quickBtn.querySelector('.down').addEventListener('click', goToBottomHandle)
   quickBtn.querySelector('.up').addEventListener('click', backToTopHandle)
+
+  if (indexImgs) {
+    // 速度系数，越小滚动越慢
+    const speed = 0.3; 
+
+    // 简单视差滚动函数
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const yOffset = scrollTop * speed;
+      indexImgs.style.transform = `translate3d(0, ${-yOffset}px, 0)`;
+    });
+  }
 
   if (!toolBtn) {
     setToolBtn(createChild(siteHeader, 'div', {

@@ -1,4 +1,4 @@
-alternate: testName # 站点大标题
+alternate: Wolfiora # 站点大标题
 
 statics: "/" # 静态文件根目录
 assets: "assets"
@@ -31,7 +31,7 @@ homeConfig:
   fixedCover: "" # 主页面cover(为空则使用bing随机图片)
   coverConfig:
     enableCover: true # 是否开启头图
-    enablePreload: true #是否开启预加载头图
+    enablePreload: true # 是否开启预加载头图
     enableNextGradientCover: false # 使用CSS渐变作为上/下一页封面
   cateCards:
     - slug: # 分类 slug
@@ -63,8 +63,8 @@ playerAPI: "https://api.injahow.cn" # 结尾不带/,只填写域名
 # 使用vercel自行部署,请参考: https://github.com/xizeyoupan/Meting-API
 
 icon:
-  favicon: "/favicon.ico"
-  apple_touch_icon: "/apple-touch-icon.png"
+  favicon: "/core/favicon.ico"
+  apple_touch_icon: "/core/apple-touch-icon.png"
 
 seo:
   bing:
@@ -79,11 +79,11 @@ visitor:
 
 darkmode: true
 auto_dark: # 自动亮/暗模式
-  enable: true #是否开启
-  start: 20 #开始时间
-  end: 7 #结束时间
+  enable: true # 是否开启
+  start: 20 # 开始时间
+  end: 7 # 结束时间
 
-auto_scroll: false
+auto_scroll: true
 
 loader:
   start: true # 进入页面时显示加载动画
@@ -100,24 +100,25 @@ fireworks:
         move: ["emit"]
         easing: easeOutExpo
         colors:
-          - "rgba(255,182,185,.9)"
-          - "rgba(250,227,217,.9)"
-          - "rgba(187,222,214,.9)"
-          - "rgba(138,198,209,.9)"
-        number: 30
-        duration: [1200, 1800]
+          - "rgba(180,120,255,0.9)"  # 紫色，更亮更柔和
+          - "rgba(255,180,120,0.9)"  # 橙色，更亮
+          - "rgba(120,180,255,0.9)"  # 蓝色，更亮
+        number: 15                   # 粒子数量减少，动画更轻快
+        duration: [900, 1300]        # 略短持续时间
         shapeOptions:
-          radius: [16, 32]
+          radius: [3, 6]             # 半径更小
+          alpha: 0.9                 # 增加透明度效果
+          lineWidth: 2               # 线条更细，视觉更轻盈
       - shape: circle
         move: ["diffuse"]
         easing: easeOutExpo
-        colors: ["#fff"]
+        colors: ["rgba(255,255,255,0.7)"] # 白色扩散粒子
         number: 1
-        duration: [1200, 1800]
+        duration: [900, 1300]
         shapeOptions:
-          radius: 20
+          radius: 5
           alpha: 0.5
-          lineWidth: 6
+          lineWidth: 3
 
 font:
   enable: true
@@ -172,11 +173,11 @@ menu:
   #   default: / || user
   #   aboutsite: /about/  || user
   #   admiration: /admiration/ || coffee
-  # posts:
-  #   default: / || feather
-  #   archives: /archives/ || list-alt
-  #   categories: /categories/ || th
-  #   tags: /tags/ || tags
+  posts:
+    default: / || feather
+    archives: /archives/ || list-alt
+    categories: /categories/ || th
+    tags: /tags/ || tags
   # friends: /friends/ || heart
 
 # https://twikoo.js.org
@@ -226,7 +227,7 @@ summary:
 # 在每次 generate 完成后需要执行`pnpm dlx pagefind --site public`，再 deploy，否则 Pagefind 无法正常工作
 # 参见：https://docs.shokax.kaitaku.xyz/features/search/#pagefind-%E6%90%9C%E7%B4%A2
 pagefind: # pagefind 本地搜索 https://pagefind.app/
-  enable: false # 是否启用
+  enable: true # 是否启用
 
 
 # Social Links
@@ -235,15 +236,15 @@ pagefind: # pagefind 本地搜索 https://pagefind.app/
 # Value before `||` delimiter is the target permalink,
 # secend value is the name of Font icon.
 social:
-  github: https://github.com/yourname || github || "#191717"
+  github: https://github.com/flwolfy || github || "#191717"
   #gitee: https://gitee.com/yourname || gitee || "#e60026"
   #google: https://plus.google.com/yourname || google
-  #twitter: https://twitter.com/yourname || twitter || "#00aff0"
+  twitter: https://twitter.com/fl_wolfy || twitter || "#00aff0"
   #zhihu: https://www.zhihu.com/people/yourname || zhihu || "#1e88e5"
   #music: https://music.163.com/#/user/home?id=yourid || cloud-music || "#e60026"
   #weibo: https://weibo.com/yourname || weibo || "#ea716e"
   #about: https://about.me/yourname || address-card || "#3b5998"
-  #email: mailto:foo@xxx.com || envelope || "#55acd5"
+  email: mailto:hsuankailiao@gmail.com || envelope || "#55acd5"
   #facebook: https://www.facebook.com/yourname || facebook
   #stackoverflow: https://stackoverflow.com/ || stack-overflow
   #youtube: https://youtube.com/yourname || youtube
@@ -256,13 +257,13 @@ sidebar:
   position: left
   # position: right
   # Replace the default avatar image under <root>/source/_data/assets/ and set the url here.
-  avatar: avatar.jpg
+  avatar: core/avatar.jpg
 
 widgets:
   # if true, will show random posts
   random_posts: true
   # if true, will show recent comments
-  recent_comments: true
+  recent_comments: false
 
 footer:
   # Specify the date when the site was set up. If not defined, current year will be used.
@@ -292,7 +293,7 @@ outime:
 
 reward:
   # If true, reward will be displayed in every article by default.
-  enable: true
+  enable: false
   account:
     wechatpay: /wechatpay.png
     alipay: /alipay.png
@@ -353,3 +354,87 @@ vendors:
       source: cdnjs
       url: KaTeX/0.16.9/katex.min.css
       sri: "sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+
+
+# markdown 配置
+markdown:
+  render: # 渲染器设置
+    html: false # 过滤 HTML 标签
+    xhtmlOut: true # 使用 '/' 来闭合单标签 （比如 <br />）。
+    breaks: true # 转换段落里的 '\n' 到 <br>。
+    linkify: true # 将类似 URL 的文本自动转换为链接。
+    typographer:
+    quotes: "“”‘’"
+  plugins: # markdown-it 插件设置
+    - plugin:
+        name: markdown-it-toc-and-anchor
+        enable: true
+        options: # 文章目录以及锚点应用的 class 名称，shoka 系主题必须设置成这样。tocFirstLevel 的值在 pug 中的 `toc` 函数中设置
+          tocClassName: "toc"
+          anchorClassName: "anchor"
+    - plugin:
+        name: markdown-it-multimd-table
+        enable: true
+        options:
+          multiline: true
+          rowspan: true
+          headerless: true
+    - plugin:
+        name: ./markdown-it-furigana
+        enable: true
+        options:
+          fallbackParens: "()"
+    - plugin:
+        name: ./markdown-it-spoiler
+        enable: true
+        options:
+          title: "你知道得太多了"
+
+# Minify 文件压缩
+minify:
+  js:
+    enable: false # ShokaX 自带 esbuild 优化，不建议开启，其他主题建议开启
+    exclude: # 排除文件，接受 string[]，需符合 micromatch 格式
+  css:
+    enable: true # 开启 CSS 优化
+    options:
+      targets: ">= 0.5%" # browserslist 格式的 target
+    exclude: # 排除文件，接受 string[]，需符合 micromatch 格式
+  html:
+    minifier: html-minifier
+    enable: true # 开启 HTML 优化
+    options:
+      comments: false # 是否保留注释内容
+    exclude: # 排除文件，接受 string[]，需符合 micromatch 格式
+  image:
+    enable: false # 开启图片预处理和自动 WebP 化
+    options:
+      avif: false
+      webp: true # 预留配置项，现版本无作用
+      quality: 80 # 质量，支持1-100的整数、lossless或nearLossless
+      effort: 2 # CPU 工作量，0-6之间的整数(越低越快)
+      replaceSrc: false # 自动替换生成html中的本地图片链接为webp链接
+      # 对于使用 CI 工作流部署的用户，请注意本配置可能导致图片 404，如果出现请关闭
+      # 我们更建议使用 Service Worker 来在用户侧实现 replaceSrc 的功能，这将能够以一种侵入式更小的方式实现链接替换
+    exclude: # 排除文件，接受 string[]，需符合 micromatch 格式
+
+# feed 生成
+feed:
+  limit: 20
+  order_by: "-date"
+  tag_dir: false
+  category_dir: false
+  rss:
+    enable: true
+    template: "node_modules/hexo-theme-shokax/layout/_alternate/rss.ejs"
+    output: "rss.xml"
+  atom:
+    enable: true
+    template: "node_modules/hexo-theme-shokax/layout/_alternate/atom.ejs"
+    output: "atom.xml"
+  jsonFeed:
+    enable: true
+    template: "node_modules/hexo-theme-shokax/layout/_alternate/json.ejs"
+    output: "feed.json"
+
+

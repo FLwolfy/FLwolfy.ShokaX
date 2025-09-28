@@ -18,7 +18,9 @@ mixin sidebarRender(display_toc)
             div(class="inner")
                 div(class="contents panel pjax" data-title=__('sidebar.toc'))
                     if display_toc
-                        != toc(page.content)
+                        //- 只显示目录，不显示 H1 标题，作为警告用
+                        - var contentWithoutH1 = (page.content || '').replace(/<h1[^>]*>.*?<\/h1>/gi, '')
+                        != toc(contentWithoutH1)
 
                 div(class="related panel pjax" data-title=__('sidebar.related'))
                     if related

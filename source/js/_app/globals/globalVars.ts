@@ -13,6 +13,7 @@ export const menuToggle = siteNav.querySelector('.toggle')
 export const quickBtn = document.getElementById('quick')
 export const sideBar = document.getElementById('sidebar')
 export const siteBrand = document.getElementById('brand')
+export const indexImgs = document.getElementById('imgs')
 export let toolBtn = document.getElementById('tool')
 export let backToTop: HTMLElement
 export let goToComment

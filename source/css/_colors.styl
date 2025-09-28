@@ -1,22 +1,26 @@
 :root {
-  --grey-0: #fff;
-  --grey-1: #fdfdfd;
-  --grey-2: #f7f7f7;
-  --grey-3: #eff2f3;
-  --grey-4: #ccc;
-  --grey-5: #999;
-  --grey-6: #666;
-  --grey-7: #333;
-  --grey-8: #222;
+  --grey-0: #fcededff;
+  --grey-1: #faedf6;
+  --grey-2: #f0ddea;
+  --grey-3: #efd0f1;
+  --grey-4: #c7a4b3;
+  --grey-5: #7a5396;
+  --grey-6: #631946;
+  --grey-7: #190a32;
+  --grey-8: #220701;
   --grey-9: #000;
 
-  --grey-1-a0: alpha(#fdfdfd, 0);
-  --grey-1-a7: alpha(#fdfdfd, .7);
-  --grey-1-a5: alpha(#fdfdfd, .5);
-  --grey-1-a3: alpha(#fdfdfd, .3);
-  --grey-9-a1: alpha(#000, .1);
+  --grey-1-a0: alpha(#faedf6, 0);
+  --grey-1-a7: alpha(#faedf6, .7);
+  --grey-1-a5: alpha(#faedf6, .5);
+  --grey-1-a3: alpha(#faedf6, .3);
+  --grey-3-a6: alpha(#efd0f1, .6);
+  --grey-6-a2: alpha(#631946, .2);
+  --grey-9-a6: alpha(#000, .6);
   --grey-9-a5: alpha(#000, .5);
-  --grey-2-a0: alpha(#f7f7f7, 0);
+  --grey-9-a3: alpha(#000, .3);
+  --grey-9-a1: alpha(#000, .1);
+  --grey-2-a0: alpha(#f0ddea, 0);
 
   --color-pink-light-old: #ffe6fa;
   --color-pink-light: alpha(#ffe6fa, .72);
@@ -43,6 +47,7 @@
   --body-bg-shadow: var(--grey-2);
   --box-bg-shadow: var(--grey-9-a1);
   --text-color: var(--grey-7);
+  --text-heading-color: var(--grey-8);
   --header-text-color: var(--grey-0);
   --primary-color: var(--color-red);
 
@@ -88,23 +93,27 @@
 
 [data-theme="dark"] {
   &:root {
-    --grey-0: #222;
-    --grey-1: #21252b;
-    --grey-2: #363636;
-    --grey-3: #444;
-    --grey-4: #666;
-    --grey-5: #aaa;
-    --grey-6: #ccc;
-    --grey-7: #ddd;
-    --grey-8: #eee;
-    --grey-9: #f7f7f7;
+    --grey-0: #210011;
+    --grey-1: #27171f;
+    --grey-2: #301a3b;
+    --grey-3: #531212;
+    --grey-4: #876861;
+    --grey-5: #877e9c;
+    --grey-6: #c6a28e;
+    --grey-7: #c0afd2;
+    --grey-8: #e4a5e9;
+    --grey-9: #f5decf;
 
-    --grey-1-a7: alpha(#222, .7);
-    --grey-1-a5: alpha(#222, .5);
-    --grey-1-a3: alpha(#222, .3);
-    --grey-1-a0: alpha(#222, 0);
-    --grey-9-a1: alpha(#333, .1);
-    --grey-2-a0: alpha(#363636, 0);
+    --grey-1-a7: alpha(#27171f, .7);
+    --grey-1-a5: alpha(#27171f, .5);
+    --grey-1-a3: alpha(#27171f, .3);
+    --grey-1-a0: alpha(#27171f, 0);
+    --grey-3-a6: alpha(#531212, .6);
+    --grey-9-a6: alpha(#f5decf, .6);
+    --grey-9-a3: alpha(#f5decf, .3);
+    --grey-9-a1: alpha(#f5decf, .1);
+    --grey-6-a2: alpha(#c6a28e, .2);
+    --grey-2-a0: alpha(#2b0238, 0);
 
     --color-pink-light: shade(#ffe6fa, 80%);
     --color-cyan-light: shade(#e3fdf5, 80%);
@@ -122,6 +131,7 @@
     --body-bg-shadow: #000;
     --box-bg-shadow: #000;
     --text-color: var(--grey-5);
+    --text-heading-color: var(--color-grey);
     --header-text-color: var(--grey-9);
   }
 

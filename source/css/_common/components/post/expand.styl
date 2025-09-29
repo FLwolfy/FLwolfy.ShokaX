@@ -53,6 +53,10 @@
         color: var(--primary-color);
       }
     }
+
+    +mobile-small() {
+      margin-right: .625rem;
+    }
   }
 
   /* ========== 具体标题样式自定义 ========== */
@@ -310,8 +314,8 @@
     border: 0.3rem solid var(--color-grey); /* 外框加粗 */
 
     img {
-      min-height: 14rem;
-      max-height: 14rem;
+      min-height: 12rem;
+      max-height: 12rem;
       border: 0;
       padding: 0;
     }
@@ -361,6 +365,12 @@
 
 .article .md {
 
+  .anchor {
+    +mobile-small() {
+      left: .375rem;
+    }
+  }
+
   .anchor::before,
   .anchor::after {
     content: "H";
@@ -374,7 +384,7 @@
     font-size: 80%;
 
     +mobile-small() {
-      left: -.625rem;
+      left: .375rem;
     }
   }
 
@@ -384,7 +394,7 @@
     line-height: 3;
 
     +mobile-small() {
-      left: -.1875rem;
+      left: .75rem;
     }
   }
 

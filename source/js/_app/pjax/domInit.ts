@@ -33,9 +33,8 @@ export default async function domInit () {
 
     // 简单视差滚动函数
     window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const yOffset = scrollTop * speed;
-      indexImgs.style.transform = `translate3d(0, ${-yOffset}px, 0)`;
+      const yOffset = window.scrollY * speed;
+      document.documentElement.style.setProperty("--parallax-offset", `-${yOffset}px`);
     });
   }
 

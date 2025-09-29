@@ -11,6 +11,11 @@
 
   border-radius: 1rem;          /* 圆角，可自行调整大小 */
   box-shadow: 0 0.25rem 0.75rem var(--box-bg-shadow); /* 阴影，可调整偏移和透明度 */
+
+  /* 响应式 */
+  +mobile() {
+    height: 50rem;
+  }
 }
 
 .osu-container::before {
@@ -40,6 +45,23 @@
   width: 70%;
   height: 100%;
   overflow: hidden;
+
+  +mobile() {
+    top: 30rem;
+    width: 100%;
+    height: 20rem;
+
+    /* 顶部渐变遮罩 */
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    -webkit-mask-composite: destination-in;
+
+    mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    mask-composite: intersect;
+  }
 }
 
 /* ==============================
@@ -146,6 +168,9 @@
   color: var(--grey-5);
 
   .meta {
+    white-space: nowrap;      /* 不允许换行 */
+    overflow: hidden;         /* 超出隐藏 */
+
     .item {
       padding: 0;
     }
@@ -206,6 +231,9 @@
   align-items: center;
 
   .meta {
+    white-space: nowrap;      /* 不允许换行 */
+    overflow: hidden;         /* 超出隐藏 */
+      
     .item {
       padding: 0;
       font-size: 0.75rem;
@@ -229,33 +257,6 @@
   display: none;
 }
 
-/* ==============================
-   响应式
-   ============================== */
-@media (max-width: 768px) {
-  .osu-container {
-    height: 50rem;
-  }
-
-  .osu-wheel {
-    position: absolute;
-    top: 30rem;
-    width: 100%;
-    height: 20rem;
-
-    /* 顶部渐变遮罩 */
-    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-size: 100% 100%;
-    -webkit-mask-composite: destination-in;
-
-    mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
-    mask-repeat: no-repeat;
-    mask-size: 100% 100%;
-    mask-composite: intersect;
-  }
-}
-
 /* =============================================================================================================== */
 
 /* ==============================
@@ -265,20 +266,12 @@
   background: var(--grey-3-a6);
   position: absolute;
   right: 0%;
-  width: 37%;
+  width: 38%;
   height: 100%; /* 整体撑满容器 */
   overflow: hidden;
   display: block;
+  border-radius: 1rem;
   gap: 0;
-
-  /* 左侧渐变透明效果 */
-  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 95%, rgba(0,0,0,0) 100%);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: cover;
-
-  mask-image: linear-gradient(to left, rgba(0,0,0,1) 95%, rgba(0,0,0,0) 100%);
-  mask-repeat: no-repeat;
-  mask-size: cover;
 
   /* 动画效果 */
   opacity: 1;
@@ -296,6 +289,21 @@
   &.fade-in {
     opacity: 1;
     transform: translateX(0); /* 从右淡入 */
+  }
+
+  /* 响应式 */
+  +mobile() {
+    width: 100%;
+    height: 28rem;
+
+    /* 底部渐变透明效果 */
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+    mask-repeat: no-repeat;
+    mask-size: cover;
   }
 }
 
@@ -344,12 +352,9 @@
   font-weight: bold;
   text-align: center;
 
-  /* 文字阴影替代描边，兼容性更好（叠加多层） */
-  text-shadow: 
-    -0.1rem -0.1rem 0 #000,
-     0.1rem -0.1rem 0 #000,
-    -0.1rem  0.1rem 0 #000,
-     0.1rem  0.1rem 0 #000;
+  /* 文字描边 */
+  -webkit-text-stroke: 0.4rem black;   /* 边框颜色和粗细 */
+  paint-order: stroke fill;                    /* 确保描边在文字外 */
 
   /* 多行省略号 */
   display: -webkit-box;            /* 盒子模型 */
@@ -374,6 +379,10 @@
 
   display: flex;
   flex-direction: column; /* 垂直排列内容 */
+
+  +mobile() {
+    padding-bottom: 2.5rem;
+  }
 }
 
 /* ==============================
@@ -417,14 +426,23 @@
   line-height: 1.2rem;
   overflow: hidden;
   flex: 1 1 auto; /* 填充剩余空间 */
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 999; /* 无限行 */
   white-space: normal;
   word-break: break-word;
+
+  /* 底部渐变透明效果 */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+  mask-repeat: no-repeat;
+  mask-size: cover;
 }
 
 /* ==============================
@@ -462,7 +480,7 @@
 /* ==============================
    响应式布局
    ============================== */
-@media (max-width: 768px) {
+@media (max-width: $mobile-wdith) {
   .track-detail {
     width: 100%;
     height: 28rem;

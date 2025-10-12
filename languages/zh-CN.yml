@@ -23,9 +23,9 @@ menu:
   about: 关于
   search: 搜索
   census: 博客访问统计
-  aboutsite: 关于本站
+  aboutsite: 站点信息
   updata: 更新日志
-  statistics: 统计
+  statistics: 站点统计
   admiration: 赞赏博主
   friends: 友链
   privacy: 隐私政策
@@ -42,8 +42,14 @@ index:
   random_posts: 随机文章
   recent_comments: 最新评论
 
+tag:
+  title: 文章标签
+
+category:
+  title: 文章分类
+
 archive:
-  title: 文章储物柜
+  archive: 文章归档
 
 post:
   posted: 发表于

@@ -35,26 +35,36 @@ block header
 
 block content
     if page.type === 'categories'
-        div(class="collapse wrap")
-            h2(class="item title")
-                a(href=url_for(site.path))
-                    != __('menu.home')
-                small
-                != _p('counter.categories', site.categories.length)
-            != _list_categories(3)
+        //- 包一层封面的布局
+        div(class="index wrap")
+            h2(class="divider")
+                != __('category.title')
+
+            div(class="collapse wrap")
+                h2(class="item title")
+                    a(href=url_for(site.path))
+                        != __('menu.home')
+                    small
+                    != _p('counter.categories', site.categories.length)
+                != _list_categories(3)
     else if page.type === 'tags'
-        div(class="collapse wrap")
-            h2(class="item title")
-                a(href=url_for(site.path))
-                    != __('menu.home')
-                small
-                != _p('counter.tag_cloud', site.tags.length)
-            div(class="tag cloud")
-                != tagcloud({min_font: theme.tagcloud.min,max_font: theme.tagcloud.max,amount: theme.tagcloud.amount,color: true,start_color: theme.tagcloud.start,end_color: theme.tagcloud.end})
+        //- 包一层封面的布局
+        div(class="index wrap")
+            h2(class="divider")
+                != __('tag.title')
+                
+            div(class="collapse wrap")
+                h2(class="item title")
+                    a(href=url_for(site.path))
+                        != __('menu.home')
+                    small
+                    != _p('counter.tag_cloud', site.tags.length)
+                div(class="tag cloud")
+                    != tagcloud({min_font: theme.tagcloud.min,max_font: theme.tagcloud.max,amount: theme.tagcloud.amount,color: true,start_color: theme.tagcloud.start,end_color: theme.tagcloud.end})
     else
         div(class="page wrap")
             != partial('_partials/post/post.pug', {post: page})
         +CommentRender
 
 block sidebar
-    +sidebarRender(true)
+    +sidebarRender(page.toc !== false)

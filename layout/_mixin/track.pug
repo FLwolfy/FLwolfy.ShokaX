@@ -9,7 +9,16 @@ mixin postTrack(post)
     .track(
         data-created=post.date.toISOString()
         data-title=title
-        data-description= _truncate(escape_html(_striptags(post.content)),300)
+        data-description= _truncate(
+            (() => {
+                let result = [], m;
+                const regex = /<p[^>]*>([\s\S]*?)<\/p>/gi;
+                while ((m = regex.exec(post.content)) !== null) {
+                    result.push('<p>' + m[1].replace(/<[^>]+>/g,'').trim() + '</p>');
+                }
+                return result.join('<br>');
+            })(),
+        1000) + ' ...'
         data-cover=url_for(cover)
         data-link=url_for(linkPath)
     )
@@ -63,12 +72,14 @@ mixin osuWheel()
         const CONFIG = {
             activeZIndex: 50,      // 激活条目的 z-index
             visibleCount: 11,      // 可见条目数量（奇数）
-            spacing: 12,           // 每条条目角度间隔（度数）
+            spacing: 15,           // 每条条目角度间隔（度数）
+            mobileSpacing: 8,      // 移动端 spacing
+            mobileThreshold: 820,  // 移动端阈值（px）
             radius: 300,           // 圆弧半径
             scrollSpeed: 0.1,      // 鼠标滚轮灵敏度
             animateSpeed: 5,       // 动画速度（数值越大越快）
             touchMoveFactor: 0.05, // 触屏/拖拽灵敏度
-            opacityFactor: 0.2,    // 不透明度衰减因子
+            opacityFactor: 0.15,    // 不透明度衰减因子
             scaleFactor: 1.5,      // 激活条目的缩放比例
             offsetX: 0,            // X 轴偏移
             snapDelay: 150,        // 自动吸附延迟（ms）
@@ -167,6 +178,16 @@ mixin osuWheel()
         }
 
         // ================================
+        // 获取当前 spacing（响应式）
+        // ================================
+        function getSpacing() {
+            if (window.innerWidth <= CONFIG.mobileThreshold) {
+                return CONFIG.mobileSpacing;
+            }
+            return CONFIG.spacing;
+        }
+
+        // ================================
         // 自动吸附函数
         // ================================
         function startSnapTimer() {
@@ -238,7 +259,7 @@ mixin osuWheel()
                 track.style.display = 'flex';
 
                 const diff = offset - i;
-                const angle = diff * CONFIG.spacing;
+                const angle = diff * getSpacing();
                 const rad = angle * Math.PI / 180;
 
                 const x = CONFIG.offsetX + Math.cos(rad) * CONFIG.radius - CONFIG.radius;

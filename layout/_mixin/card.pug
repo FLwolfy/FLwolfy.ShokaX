@@ -24,9 +24,8 @@ mixin CardRender(item)
                 ul(class="posts")
                     each sub in item.subs
                         - var subname = sub.name || sub.title
-                        li
-                            a(title=subname href=url_for(sub.path))
-                                = subname
+                        a(href=url_for(sub.path) title=subname)
+                            = subname
                 div(class="meta footer")
                     if item.top
                         span

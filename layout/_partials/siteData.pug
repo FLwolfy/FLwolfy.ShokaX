@@ -1,0 +1,39 @@
+//- layout/_partials/siteData.pug
+script.
+  (function() {
+    // ======================================================
+    // 全局 siteData — 完全响应式
+    // ======================================================
+
+    // 派发自定义事件
+    function dispatchSiteDataChange(path, value) {
+      window.dispatchEvent(new CustomEvent('siteDataChange', {
+        detail: { path, value }
+      }));
+    }
+
+    // 创建可深层监听的 Proxy
+    window.createReactiveObject = function(obj, path = []) {
+      return new Proxy(obj, {
+        set(target, key, value) {
+          const fullPath = [...path, key];
+          const newValue = (typeof value === 'object' && value !== null)
+            ? window.createReactiveObject(value, fullPath)
+            : value;
+
+          target[key] = newValue;
+          dispatchSiteDataChange(fullPath.join('.'), newValue);
+          return true;
+        },
+        get(target, key) {
+          const value = target[key];
+          // 确保深层对象也始终是 reactive
+          if (typeof value === 'object' && value !== null && !value.__isProxy) {
+            target[key] = window.createReactiveObject(value, [...path, key]);
+            target[key].__isProxy = true;
+          }
+          return target[key];
+        }
+      });
+    };
+  })();

@@ -1,6 +1,4 @@
 extends _partials/layout.pug
-include _mixin/track.pug
-
 include _mixin/segment.pug
 
 block head
@@ -26,23 +24,8 @@ block content
     //- 包一层封面的布局
     div(class="index wrap")
         h2(class="divider")
-            != __('archive.title')
-
+            != __('archive.archive')
         div(class="collapse wrap")
-            //- 这里添加 osu 选表
-            .osu-container
-                // 左侧轮盘
-                .osu-wheel
-                    each post in page.posts.toArray()
-                        +postTrack(post)
-    
-                // 右侧详情
-                .track-detail
-                    +postInfo()
-
-            +osuWheel()
-            //- ///////////////
-
             h2(class="item header")
                 if is_month()
                     a(href=url_for(config.archive_dir))

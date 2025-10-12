@@ -14,16 +14,22 @@
     margin: 6.25rem auto;
   }
 
+  .anchor {
+    +mobile-small() {
+      left: .375rem;
+    }
+  }
+
   .anchor::before {
     font-family-icons();
     color: var(--grey-4);
     position: absolute;
     left: -1.5625rem;
-    margin-top: .25rem;
+    margin-top: .05rem;
     visibility: visible;
 
     +mobile-small() {
-      left: -.1875rem;
+      left: .825rem;
     }
   }
 

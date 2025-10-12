@@ -99,11 +99,18 @@ export const scrollHandle = () => {
 // 可见度监听(离开页面和返回时更改document的title)
 export const visibilityListener = () => {
   const iconNode = document.querySelector('[rel="icon"]')
+
+  // 辅助函数：随机选择字符串
+  const randomFaviconText = (str) => {
+    const arr = str.split('|') // 按分隔符拆分
+    return arr[Math.floor(Math.random() * arr.length)]
+  }
+
   document.addEventListener('visibilitychange', () => {
     switch (document.visibilityState) {
       case 'hidden':
         iconNode.setAttribute('href', statics + CONFIG.favicon.hidden)
-        document.title = LOCAL.favicon.hide
+        document.title = randomFaviconText(LOCAL.favicon.hide)
         if (CONFIG.loader.switch) {
           Loader.show()
         }
@@ -111,7 +118,7 @@ export const visibilityListener = () => {
         break
       case 'visible':
         iconNode.setAttribute('href', statics + CONFIG.favicon.normal)
-        document.title = LOCAL.favicon.show
+        document.title = randomFaviconText(LOCAL.favicon.show)
         if (CONFIG.loader.switch) {
           Loader.hide(1000)
         }

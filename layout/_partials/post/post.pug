@@ -32,11 +32,14 @@ article(itemscope itemtype="http://schema.org/Article" class="post block" data-p
                     a(href!=url_for(tag.path) rel="tag")
                         i(class="ic i-tag")
                         != tag.name
-    footer
-        != partial('_partials/post/footer.pug')
-        if theme.reward.enable
-            != partial('_partials/post/reward.pug', {}, {cache: true})
-        if theme.creative_commons.license
-            != partial('_partials/post/copyright.pug')
+
+    //- 添加选择可以不显示页脚
+    if page.footer !== false
+        footer
+            != partial('_partials/post/footer.pug')
+            if theme.reward.enable
+                != partial('_partials/post/reward.pug', {}, {cache: true})
+            if theme.creative_commons.license
+                != partial('_partials/post/copyright.pug')
     
     != shokax_inject('postBodyEnd')

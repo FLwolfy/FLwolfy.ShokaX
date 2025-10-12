@@ -34,8 +34,10 @@ homeConfig:
     enablePreload: true # 是否开启预加载头图
     enableNextGradientCover: false # 使用CSS渐变作为上/下一页封面
   cateCards:
-    - slug: # 分类 slug
-      cover: # 分类封面
+    - slug: game
+      cover: ../_data/assets/category/game.jpg
+    - slug: anime
+      cover: ../_data/assets/category/anime.jpg
 
 # ShokaX 模块化分包引入设置
 # 请关闭所有不使用的模块以优化主题 js 体积和性能
@@ -68,14 +70,14 @@ icon:
 
 seo:
   bing:
-  google:
+  google: HhoMl-Ti78sYFRZ3SDmymFEV-FbcwWW8Q1_hK8kOOh8
   yandex:
   baidu:
 
 visitor:
   clarity: false
   baiduAnalytics: false
-  googleAnalytics: false
+  googleAnalytics: G-P4BPV1LJ9Z
 
 darkmode: true
 auto_dark: # 自动亮/暗模式
@@ -83,7 +85,7 @@ auto_dark: # 自动亮/暗模式
   start: 20 # 开始时间
   end: 7 # 结束时间
 
-auto_scroll: true
+auto_scroll: false
 
 loader:
   start: true # 进入页面时显示加载动画
@@ -165,19 +167,20 @@ font:
 
 # //at.alicdn.com/t/c/font_4415496_59g1326wajd.css => 4415496_59g1326wajd
 # 自定义iconfont图标参见文档教程
-iconfont: "4415496_59g1326wajd"
+iconfont: "5038032_k77kv9bxg8"
 
 menu:
   home: / || home
-  # about:
-  #   default: / || user
-  #   aboutsite: /about/  || user
-  #   admiration: /admiration/ || coffee
   posts:
     default: / || feather
-    archives: /archives/ || list-alt
+    archives: /archives/ || archive
     categories: /categories/ || th
     tags: /tags/ || tags
+  about:
+    default: / || address-card
+    aboutsite: /aboutsite/ || guanyu
+    statistics: /stats/ || tongji
+  #   admiration: /admiration/ || coffee
   # friends: /friends/ || heart
 
 # https://twikoo.js.org
@@ -189,17 +192,17 @@ twikoo:
 
 # https://waline.js.org/
 waline:
-  enable: false
-  serverURL: ""
+  enable: true
+  serverURL: "comment.flwolfy.xyz"
   lang: "zh-CN"
-  locale: {} # https://waline.js.org/guide/features/i18n.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AF%AD%E8%A8%80
-  emoji: # 表情包
-    # - https://unpkg.com/@waline/emojis@1.0.1/weibo
-    # - https://unpkg.com/@waline/emojis@1.0.1/alus
-    # - https://unpkg.com/@waline/emojis@1.0.1/bilibili
-    # - https://unpkg.com/@waline/emojis@1.0.1/qq
-    # - https://unpkg.com/@waline/emojis@1.0.1/tieba
-    # - https://unpkg.com/@waline/emojis@1.0.1/tw-emoji
+  locale: {} # 本地化替换，详见 waline 文档 https://waline.js.org/guide/features/i18n.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AF%AD%E8%A8%80
+  emoji: # 表情包，默认为 waline 官方配置
+    - https://unpkg.com/@waline/emojis@1.0.1/weibo
+    - https://unpkg.com/@waline/emojis@1.0.1/alus
+    - https://unpkg.com/@waline/emojis@1.0.1/bilibili
+    - https://unpkg.com/@waline/emojis@1.0.1/qq
+    - https://unpkg.com/@waline/emojis@1.0.1/tieba
+    - https://unpkg.com/@waline/emojis@1.0.1/tw-emoji
   meta: # 可以填写的内容
     - nick
     - mail
@@ -207,9 +210,9 @@ waline:
   requiredMeta: # 必须填写的内容
     - nick
     - mail
-  wordLimit: 0 # 字数限制,0为不限制
+  wordLimit: 150 # 字数限制,0为不限制
   pageSize: 10 # 每页评论条数
-  pageview: false # 是否开启浏览量统计,可独立开启
+  pageview: true # 是否开启浏览量统计,可独立开启
   recaptchaV3Key: # reCAPTCHA v3密钥
   turnstileKey: # Turnstile密钥
 
@@ -263,7 +266,7 @@ widgets:
   # if true, will show random posts
   random_posts: true
   # if true, will show recent comments
-  recent_comments: false
+  recent_comments: true
 
 footer:
   # Specify the date when the site was set up. If not defined, current year will be used.
@@ -323,9 +326,9 @@ creative_commons:
 
 # bgm
 audio:
-#  - title: 列表1
-#    list:
-#      - https://music.163.com/#/playlist?id=2943811283
+  - title: FLwolfy - 博客歌单
+    list:
+      - https://music.163.com/#/playlist?id=14385412950
 #  - title: 列表2
 #    list:
 #      - https://music.163.com/#/playlist?id=2031842656
@@ -354,87 +357,3 @@ vendors:
       source: cdnjs
       url: KaTeX/0.16.9/katex.min.css
       sri: "sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
-
-
-# markdown 配置
-markdown:
-  render: # 渲染器设置
-    html: false # 过滤 HTML 标签
-    xhtmlOut: true # 使用 '/' 来闭合单标签 （比如 <br />）。
-    breaks: true # 转换段落里的 '\n' 到 <br>。
-    linkify: true # 将类似 URL 的文本自动转换为链接。
-    typographer:
-    quotes: "“”‘’"
-  plugins: # markdown-it 插件设置
-    - plugin:
-        name: markdown-it-toc-and-anchor
-        enable: true
-        options: # 文章目录以及锚点应用的 class 名称，shoka 系主题必须设置成这样。tocFirstLevel 的值在 pug 中的 `toc` 函数中设置
-          tocClassName: "toc"
-          anchorClassName: "anchor"
-    - plugin:
-        name: markdown-it-multimd-table
-        enable: true
-        options:
-          multiline: true
-          rowspan: true
-          headerless: true
-    - plugin:
-        name: ./markdown-it-furigana
-        enable: true
-        options:
-          fallbackParens: "()"
-    - plugin:
-        name: ./markdown-it-spoiler
-        enable: true
-        options:
-          title: "你知道得太多了"
-
-# Minify 文件压缩
-minify:
-  js:
-    enable: false # ShokaX 自带 esbuild 优化，不建议开启，其他主题建议开启
-    exclude: # 排除文件，接受 string[]，需符合 micromatch 格式
-  css:
-    enable: true # 开启 CSS 优化
-    options:
-      targets: ">= 0.5%" # browserslist 格式的 target
-    exclude: # 排除文件，接受 string[]，需符合 micromatch 格式
-  html:
-    minifier: html-minifier
-    enable: true # 开启 HTML 优化
-    options:
-      comments: false # 是否保留注释内容
-    exclude: # 排除文件，接受 string[]，需符合 micromatch 格式
-  image:
-    enable: false # 开启图片预处理和自动 WebP 化
-    options:
-      avif: false
-      webp: true # 预留配置项，现版本无作用
-      quality: 80 # 质量，支持1-100的整数、lossless或nearLossless
-      effort: 2 # CPU 工作量，0-6之间的整数(越低越快)
-      replaceSrc: false # 自动替换生成html中的本地图片链接为webp链接
-      # 对于使用 CI 工作流部署的用户，请注意本配置可能导致图片 404，如果出现请关闭
-      # 我们更建议使用 Service Worker 来在用户侧实现 replaceSrc 的功能，这将能够以一种侵入式更小的方式实现链接替换
-    exclude: # 排除文件，接受 string[]，需符合 micromatch 格式
-
-# feed 生成
-feed:
-  limit: 20
-  order_by: "-date"
-  tag_dir: false
-  category_dir: false
-  rss:
-    enable: true
-    template: "node_modules/hexo-theme-shokax/layout/_alternate/rss.ejs"
-    output: "rss.xml"
-  atom:
-    enable: true
-    template: "node_modules/hexo-theme-shokax/layout/_alternate/atom.ejs"
-    output: "atom.xml"
-  jsonFeed:
-    enable: true
-    template: "node_modules/hexo-theme-shokax/layout/_alternate/json.ejs"
-    output: "feed.json"
-
-

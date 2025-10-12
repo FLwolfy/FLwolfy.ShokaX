@@ -71,6 +71,12 @@
     .anchor::before {
       content: "⚠️" !important;
     }
+
+    +mobile-small() {
+      .anchor::after {
+        content: "" !important;
+      }
+    }
   }
 
   h1::before,
@@ -140,7 +146,7 @@
   h4 {
     &::after {
       color: var(--color-grey);
-      content: "≻꧂";
+      content: "꧂";
       margin-left: 0.25rem;
       opacity: 0.4;
     }
@@ -287,8 +293,10 @@
     color: inherit;           // 保持文字颜色和正文一致
   }
 
+  /* 表格图片配置，默认 small */
   img {
-    width: auto;
+    max-height: 12rem;
+    width: 100%;
     display: block;
     object-fit: cover;
 
@@ -306,6 +314,18 @@
     }
   }
 
+  .medium-imgs img {
+    max-height: 24rem; 
+  }
+
+  .large-imgs img {
+    max-height: 36rem; 
+  }
+
+  .max-imgs img {
+    width: 100%;
+  }
+
   table {
     width: auto;
     margin-left: auto;  /* 水平居中 */
@@ -314,17 +334,20 @@
     border: 0.3rem solid var(--color-grey); /* 外框加粗 */
 
     img {
-      min-height: 12rem;
-      max-height: 12rem;
       border: 0;
       padding: 0;
     }
+
+    +mobile() {
+      width: 100%;
+      table-layout: fixed;
+    }
   }
+
   table th,
   table td {
     background: var(--grey-4);
     border: 0.3rem solid var(--color-grey); /* 单元格线条加粗 */
-    padding: 0.7rem 0.7rem;                /* 给点内边距，不会太挤 */
   }
 
   ruby {
@@ -394,7 +417,7 @@
     line-height: 3;
 
     +mobile-small() {
-      left: .75rem;
+      left: .875rem;
     }
   }
 

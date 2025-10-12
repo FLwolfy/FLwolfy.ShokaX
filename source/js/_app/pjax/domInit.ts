@@ -8,8 +8,7 @@ import {
   showContents,
   siteHeader,
   siteNav,
-  toolBtn,
-  indexImgs
+  toolBtn
 } from '../globals/globalVars'
 import { Loader } from '../globals/thirdparty'
 import { createChild } from '../library/proto'
@@ -27,16 +26,84 @@ export default async function domInit () {
   quickBtn.querySelector('.down').addEventListener('click', goToBottomHandle)
   quickBtn.querySelector('.up').addEventListener('click', backToTopHandle)
 
-  if (indexImgs) {
-    // 速度系数，越小滚动越慢
-    const speed = 0.3; 
+  // ==============================
+  // 背景图视差滚动
+  // ==============================
 
-    // 简单视差滚动函数
+  const indexImgs = document.getElementById('imgs');
+  const scrollSpeed = 0.3;
+  let latestScrollY = 0;
+  let ticking = false;
+  if (indexImgs) {
     window.addEventListener('scroll', () => {
-      const yOffset = window.scrollY * speed;
-      document.documentElement.style.setProperty("--parallax-offset", `-${yOffset}px`);
+      latestScrollY = window.scrollY;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const yOffset = latestScrollY * scrollSpeed;
+          document.documentElement.style.setProperty("--parallax-offset", `-${yOffset}px`);
+          ticking = false;
+        });
+        ticking = true;
+      }
     });
   }
+
+  // ==============================
+  // 侧边栏阴影控制
+  // ==============================
+
+  const inner = document.querySelector('#sidebar .panels > .inner');
+  if (inner) {
+    const updateShadows = () => {
+      const scrollTop = inner.scrollTop;
+      const maxScroll = inner.scrollHeight - inner.clientHeight;
+
+      inner.classList.toggle('scroll-top', scrollTop > 0);
+      inner.classList.toggle('scroll-bottom', scrollTop < maxScroll);
+    };
+
+    inner.addEventListener('scroll', updateShadows);
+    window.addEventListener('resize', updateShadows);
+    updateShadows();
+  }
+
+  // ==============================
+  // osu-container 动画控制函数
+  // ==============================
+
+  function toggleOsuContainer() {
+    const osuContainer = document.getElementById('osuContainer');
+    if (!osuContainer) return;
+
+    if (osuContainer.style.display === 'block') {
+      hideOsuContainer();
+    } else {
+      osuContainer.style.display = 'block';
+      void osuContainer.offsetWidth;
+      osuContainer.style.opacity = '1';
+      osuContainer.style.transform = 'translate(-50%, -55%)';
+    }
+  }
+
+  function hideOsuContainer() {
+    const osuContainer = document.getElementById('osuContainer');
+    if (!osuContainer) return;
+
+    osuContainer.style.opacity = '0';
+    osuContainer.style.transform = 'translate(-50%, -80%)';
+    osuContainer.addEventListener(
+      'transitionend',
+      () => {
+        osuContainer.style.display = 'none';
+      },
+      { once: true }
+    );
+  }
+
+  document.querySelector('li.item.wheel > i')?.addEventListener('click', toggleOsuContainer);
+  document.getElementById('osu-close')?.addEventListener('click', hideOsuContainer);
+
+  // ==============================
 
   if (!toolBtn) {
     setToolBtn(createChild(siteHeader, 'div', {

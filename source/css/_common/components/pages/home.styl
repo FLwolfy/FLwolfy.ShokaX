@@ -144,6 +144,13 @@ $item {
         margin: 0;
         white-space: normal;
         text-align: center;
+
+        font-size: 2.5rem;
+        font-weight: bold;
+
+        /* 文字描边 */
+        -webkit-text-stroke: 0.4rem black;   /* 边框颜色和粗细 */
+        paint-order: stroke fill;                    /* 确保描边在文字外 */
       }
 
       &::before {
@@ -225,14 +232,28 @@ $item {
       justify-content: space-between;
       align-content: baseline;
       min-height: 5rem;
-      overflow: hidden;
 
-      li {
+      a {
         width: 45%;
         overflow: hidden;
         white-space: nowrap;
+        text-align: center;
         text-overflow: ellipsis;
+        font-weight: bold;
         color: var(--primary-color);
+
+        background: var(--grey-2-a6);
+        border-radius: 0.5rem;
+        padding: 0.3rem 0.6rem;
+
+        box-shadow: 0 2px 6px var(--box-bg-shadow);  /* 基础阴影 */
+        transition: all 0.2s ease-in-out;           /* 平滑过渡 */
+      }
+
+      a:hover {
+        background: var(--color-orange);
+        transform: translateY(-4px);                /* 上移一点 */
+        box-shadow: 0 6px 12px var(--box-bg-shadow); /* hover 阴影更明显 */
       }
     }
   }

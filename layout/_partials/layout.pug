@@ -1,6 +1,7 @@
 include ../_mixin/breadcrumb.pug
 include ../_mixin/sidebar.pug
 include ../_mixin/widgets.pug
+include ../_mixin/track.pug
 
 - var covers = _cover_index(page, 6)
 - var enableFixedCover = theme.homeConfig?.fixedCover
@@ -25,7 +26,7 @@ html(lang=page.language?page.language:config.language, style=theme.grayMode ? 'f
         block head
         title
             block title
-                != `${alternate?alternate + " = ":""}${title}${subtitle?" = "+subtitle:""}`
+                != `${alternate ? alternate : title ? title : config.title}`
     body(itemscope itemtype="http://schema.org/WebPage")
         != partial('_partials/loading.pug', {}, {cache: true})
         div(id="pagefind_mount")
@@ -82,6 +83,19 @@ html(lang=page.language?page.language:config.language, style=theme.grayMode ? 'f
                     div(class="widgets")
                         +WRender
                     != partial('_partials/footer.pug', {}, {cache: true})
+
+        //- 这里添加 osu 选表
+        div(class="osu-container" id="osuContainer" style="display: none; opacity: 0;")
+            div(class="osu-wheel")
+                each post in site.posts.toArray()
+                    +postTrack(post)
+            div(class="track-detail")
+                +postInfo()
+            i(class="i-ri-close-line absolute bottom-4 right-4 cursor-pointer text-8" id="osu-close")
+
+        +osuWheel()
+        //- ///////////////
+
         - var ccIcon = '<i class="ic i-creative-commons"></i>'
         - var ccText = theme.creative_commons.license.toUpperCase()
         - var audioValue

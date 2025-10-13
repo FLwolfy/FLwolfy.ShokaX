@@ -124,6 +124,13 @@ export default async function domInit () {
     }))
   }
 
+  // 如果没有 #comments，则隐藏 chat
+  const commentsEl = document.getElementById('comments')
+  const chatEl = toolBtn.querySelector<HTMLElement>('.chat')
+  if (!commentsEl && chatEl) {
+    chatEl.style.display = 'none'
+  }
+
   setBackToTop(toolBtn.querySelector('.back-to-top'))
   setGoToComment(toolBtn.querySelector('.chat'))
   setShowContents(toolBtn.querySelector('.contents'))

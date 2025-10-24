@@ -68,41 +68,7 @@ export default async function domInit () {
   }
 
   // ==============================
-  // osu-container 动画控制函数
-  // ==============================
-
-  function toggleOsuContainer() {
-    const osuContainer = document.getElementById('osuContainer');
-    if (!osuContainer) return;
-
-    if (osuContainer.style.display === 'block') {
-      hideOsuContainer();
-    } else {
-      osuContainer.style.display = 'block';
-      void osuContainer.offsetWidth;
-      osuContainer.style.opacity = '1';
-      osuContainer.style.transform = 'translate(-50%, -55%)';
-    }
-  }
-
-  function hideOsuContainer() {
-    const osuContainer = document.getElementById('osuContainer');
-    if (!osuContainer) return;
-
-    osuContainer.style.opacity = '0';
-    osuContainer.style.transform = 'translate(-50%, -80%)';
-    osuContainer.addEventListener(
-      'transitionend',
-      () => {
-        osuContainer.style.display = 'none';
-      },
-      { once: true }
-    );
-  }
-
-  document.querySelector('li.item.wheel > i')?.addEventListener('click', toggleOsuContainer);
-  document.getElementById('osu-close')?.addEventListener('click', hideOsuContainer);
-
+  // 站点工具栏
   // ==============================
 
   if (!toolBtn) {
@@ -124,7 +90,11 @@ export default async function domInit () {
     }))
   }
 
-  // 如果没有 #comments，则隐藏 chat
+  // ==============================
+  // 评论区按钮隐藏
+  // 若页面无评论区则隐藏评论按钮
+  // ==============================
+
   const commentsEl = document.getElementById('comments')
   const chatEl = toolBtn.querySelector<HTMLElement>('.chat')
   if (!commentsEl && chatEl) {
@@ -143,6 +113,9 @@ export default async function domInit () {
     await initAudioPlayer()
   }
   
+  // ==============================
+  // 视口观察器
+  // ==============================
 
   const createIntersectionObserver = () => {
     // waves在视口外时停止动画

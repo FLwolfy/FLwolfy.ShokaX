@@ -1,8 +1,6 @@
 ## 公告
-**[EdgeOne 赞助内容公告 & 抽取 EdgeOne 兑换码活动通知](https://github.com/theme-shoka-x/hexo-theme-shokaX/discussions/446)** \
-**[ShokaX 现已支持 Pagefind 搜索](https://github.com/theme-shoka-x/hexo-theme-shokaX/discussions/445)** \
-**[ShokaX 0.4/0.5 生命周期计划](https://github.com/theme-shoka-x/hexo-theme-shokaX/discussions/426)** \
-**[ShokaX 0.5 迁移指南](https://docs.shokax.kaitaku.xyz/getting-started/migrate/)**
+**[ShokaX Astro 已初步达到生产稳定](https://github.com/theme-shoka-x/astro-blog-shokax/discussions/11)**
+**[关于 ShokaX Hexo 生命周期方案](https://github.com/theme-shoka-x/hexo-theme-shokaX/discussions/463)**
 
 ## ShokaX
 
@@ -23,6 +21,63 @@ ShokaX 提供了如下改进：
 
 注意：ShokaX 不支持传统 Hexo 主题的 Git Clone 式安装，请不要“想当然”。
 
+github Actions 自动部署配置示例：
+```yaml
+#将以下代码放入项目目录.github/workflows/pages.yml，如果没有就新建一个
+name: Pages
+
+on:
+  push:
+    branches:
+      - main # default branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # If your repository depends on submodule, please see: https://github.com/actions/checkout
+          submodules: recursive
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          # Examples: 20, 18.19, >=16.20.2, lts/Iron, lts/Hydrogen, *, latest, current, node
+          # Ref: https://github.com/actions/setup-node#supported-version-syntax
+          node-version: 22
+      - name: Install dependencies
+        run: npm install pnpm -g
+
+      - name: Build TypeScript files
+        run: |
+          pnpm install
+          echo "NO_DEPS_HOIST=true" >> $GITHUB_ENV
+          pnpm build
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+```
 ## 📚子项目
 - [ShokaX UIKit](https://github.com/theme-shoka-x/ShokaX-UI-Kit/tree/main/packages/shokax-uikit) ShokaX 平台无关 UI 组件库
 - [Nyx Player](https://github.com/theme-shoka-x/ShokaX-UI-Kit/tree/main/packages/nyx-player) ShokaX 音乐播放器的 Vue 3 重构实现

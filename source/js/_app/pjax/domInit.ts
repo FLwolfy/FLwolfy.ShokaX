@@ -1,9 +1,10 @@
-import { backToTopHandle, goToBottomHandle, sideBarToggleHandle } from '../components/sidebar'
+import { backToTopHandle, goToBottomHandle, goToCommentHandle, sideBarToggleHandle } from '../components/sidebar'
 import {
   backToTop,
+  goToComment,
   loadCat,
   menuToggle,
-  quickBtn, setBackToTop, setShowContents, setToolBtn,
+  quickBtn, setBackToTop, setGoToComment, setShowContents, setToolBtn,
   showContents,
   siteHeader,
   siteNav,
@@ -79,6 +80,9 @@ export default async function domInit () {
                   <div class="item contents">
                     <i class="ic i-list-ol"></i>
                   </div>
+                  <div class="item chat">
+                    <i class="ic i-comments"></i>
+                  </div>
                   <div class="item back-to-top">
                     <i class="ic i-arrow-up"></i>
                     <span>0%</span>
@@ -86,10 +90,23 @@ export default async function domInit () {
     }))
   }
 
+  // ==============================
+  // 评论区按钮隐藏
+  // 若页面无评论区则隐藏评论按钮
+  // ==============================
+
+  const commentsEl = document.getElementById('comments')
+  const chatEl = toolBtn.querySelector<HTMLElement>('.chat')
+  if (!commentsEl && chatEl) {
+    chatEl.style.display = 'none'
+  }
+
   setBackToTop(toolBtn.querySelector('.back-to-top'))
+  setGoToComment(toolBtn.querySelector('.chat'))
   setShowContents(toolBtn.querySelector('.contents'))
 
   backToTop.addEventListener('click', backToTopHandle)
+  goToComment.addEventListener('click', goToCommentHandle)
   showContents.addEventListener('click', sideBarToggleHandle)
 
   if (__shokax_player__) {

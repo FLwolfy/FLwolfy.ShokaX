@@ -15,6 +15,7 @@ export const sideBar = document.getElementById('sidebar')
 export const siteBrand = document.getElementById('brand')
 export let toolBtn = document.getElementById('tool')
 export let backToTop: HTMLElement
+export let goToComment
 export let showContents: HTMLElement
 export let siteSearch = document.getElementById('search')
 export let siteNavHeight: number, headerHightInner: number, headerHight: number
@@ -64,6 +65,10 @@ export function setOriginTitle (value:string):void {
 
 export function setBackToTop (value:HTMLElement):void {
   backToTop = value
+}
+
+export function setGoToComment (value:any):void {
+  goToComment = value
 }
 
 export function setShowContents (value:any):void {

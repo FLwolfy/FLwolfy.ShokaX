@@ -40,6 +40,7 @@ index:
   category: 精選分類
   posts: 文章列表
   random_posts: 隨機文章
+  recent_comments: 最新評論
 
 post:
   posted: 發表於

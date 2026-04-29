@@ -29,7 +29,7 @@ export const pagePosition = () => {
   }
 }
 
-export const positionInit = () => {
+export const positionInit = (comment?: boolean) => {
   // 获取页面锚点
   const anchor = window.location.hash
 
@@ -50,6 +50,10 @@ export const positionInit = () => {
     setLocalHash(1)
   }
 
+  if (comment && anchor && !LOCAL_HASH) {
+    pageScroll(target)
+    setLocalHash(1)
+  }
 }
 
 /*

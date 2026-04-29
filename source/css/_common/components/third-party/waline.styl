@@ -1,0 +1,65 @@
+:root {
+  /* Font Size */
+  --waline-font-size: 16px;
+
+  /* Regular color */
+  --waline-white: var(--grey-0);            
+  --waline-light-grey: var(--grey-5);       /* 浅灰变深一点 */
+  --waline-dark-grey: var(--grey-7);        /* 深灰紫更明显 */
+
+  /* Theme Color */
+  --waline-theme-color: var(--color-purple);      
+  --waline-active-color: var(--color-pink);       
+
+  /* Layout Color */
+  --waline-color: var(--grey-7);            /* 主文字颜色，明显一点 */
+  --waline-bg-color: var(--grey-1);         /* 背景改为 grey-1 */
+  --waline-bg-color-light: var(--grey-0-a7);  
+  --waline-bg-color-hover: var(--grey-2-a6);   
+  --waline-border-color: var(--grey-5);    
+  --waline-disable-bg-color: var(--grey-0-a3); 
+  --waline-disable-color: var(--grey-4);    
+  --waline-code-bg-color: var(--grey-6);    
+
+  /* Special Color */
+  --waline-bq-color: var(--grey-3);        
+
+  /* Avatar */
+  --waline-avatar-size: 3.25rem;
+  --waline-m-avatar-size: calc(var(--waline-avatar-size) * 9 / 13);
+
+  /* Badge */
+  --waline-badge-color: var(--color-blue);
+  --waline-badge-font-size: 0.775em;
+
+  /* Information */
+  --waline-info-bg-color: var(--grey-2);
+  --waline-info-color: var(--grey-5);
+  --waline-info-font-size: 0.625em;
+
+  /* Render choice */
+  --waline-border: 1px solid var(--waline-border-color);
+  --waline-avatar-radius: 50%;
+  --waline-box-shadow: none;
+}
+
+/* Dark Mode */
+[data-theme="dark"] {
+  &:root {
+    --waline-white: var(--grey-9);
+    --waline-light-grey: var(--grey-6);
+    --waline-dark-grey: var(--grey-5);
+
+    --waline-color: var(--grey-7);           /* 更明显的文字颜色 */
+    --waline-bg-color: var(--grey-1);
+    --waline-bg-color-light: var(--grey-1-a3);
+    --waline-border-color: var(--grey-6-a2);
+    --waline-disable-bg-color: var(--grey-1-a3);
+    --waline-disable-color: var(--grey-4);
+
+    --waline-bq-color: var(--grey-3-a6);
+
+    --waline-info-bg-color: var(--grey-2);
+    --waline-info-color: var(--grey-6);
+  }
+}

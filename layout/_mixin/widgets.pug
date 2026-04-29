@@ -9,6 +9,8 @@ mixin field(item)
             != _url(link1, postText + (postTitleIcon || ''))
 
 mixin WRender(item)
+    - var tk = theme?.twikoo?.enable
+    - var waline = theme.waline.enable
     if theme.widgets.random_posts
         div(class="rpost pjax")
             h2
@@ -17,3 +19,10 @@ mixin WRender(item)
                 - var posts = site.posts.shuffle().limit(10).toArray()
                 each item in posts
                     +field(item)
+    if theme.widgets.recent_comments
+        div(class="rpost pjax")
+            h2
+                != __('index.recent_comments')
+            if tk || waline
+                ul(class="leancloud-recent-comment" id="new-comment")
+

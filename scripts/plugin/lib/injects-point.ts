@@ -7,6 +7,7 @@ export default {
     'postBodyEnd',
     'footer',
     'bodyEnd',
+    'comment',
     'status'
   ],
   styles: [

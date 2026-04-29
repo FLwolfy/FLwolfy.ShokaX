@@ -1,5 +1,6 @@
 extends _partials/layout.pug
 include _mixin/sidebar.pug
+include _mixin/comment.pug
 
 block head
     != _css('post.css')
@@ -63,6 +64,7 @@ block content
     else
         div(class="page wrap")
             != partial('_partials/post/post.pug', {post: page})
+        +CommentRender
 
 block sidebar
     +sidebarRender(page.toc !== false)

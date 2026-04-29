@@ -227,10 +227,6 @@ export const goToBottomHandle = () => {
   pageScroll(parseInt(String(getHeight(Container))))
 }
 
-export const goToCommentHandle = () => {
-  pageScroll(document.getElementById('comments'))
-}
-
 export const menuActive = () => {
   document.querySelectorAll('.menu .item:not(.title)').forEach((element) => {
     const target = <HTMLAnchorElement> element.querySelector('a[href]')

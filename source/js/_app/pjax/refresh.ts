@@ -53,45 +53,6 @@ export const siteRefresh = async (reload) => {
   const pagePost = await import('../page/post')
   await pagePost.postBeauty()
 
-  const cpel = document.getElementById('copyright')
-  if (cpel) {
-    const comment = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          if (__shokax_waline__) {
-            import('../components/comments').then(({walinePageview, walineComment}) => {
-              walinePageview()
-              walineComment()
-            })
-          }
-          if (__shokax_twikoo__) {
-            import('../components/tcomments').then(({twikooComment}) => {
-              twikooComment()
-            })
-          }
-          comment.disconnect()
-        }
-      })
-    }, {
-      root: null,
-      threshold: 0.2
-    })
-
-    comment.observe(cpel)
-  }
-
-  if (__shokax_waline__) {
-    import('../components/comments').then(async ({walineRecentComments}) => {
-      await walineRecentComments()
-    })
-  }
-
-  if (__shokax_twikoo__) {
-    import('../components/tcomments').then(async ({twikooRecentComments}) => {
-      await twikooRecentComments()
-    })
-  }
-
   if (__shokax_tabs__) {
     tabFormat()
   }

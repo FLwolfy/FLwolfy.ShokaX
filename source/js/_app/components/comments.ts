@@ -4,10 +4,18 @@ import { pageviewCount } from '@waline/client/pageview'
 // @ts-ignore
 await import('@waline/client/style')
 
+const normalizeServerURL = function (url: string) {
+  const trimmed = (url || '').trim().replace(/\/+$/, '')
+  if (!trimmed) return ''
+  if (/^https?:\/\//i.test(trimmed)) return trimmed
+  return `https://${trimmed}`
+}
+
 export const walineComment = function () {
+  const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
   init({
     el: '#comments',
-    serverURL: CONFIG.waline.serverURL,
+    serverURL,
     lang: CONFIG.waline.lang,
     locale: CONFIG.waline.locale,
     emoji: CONFIG.waline.emoji,
@@ -24,17 +32,21 @@ export const walineComment = function () {
 }
 
 export const walinePageview = function () {
+  const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
   pageviewCount({
-    serverURL: CONFIG.waline.serverURL,
+    serverURL,
     path: window.location.pathname
   })
 }
 
 export const walineRecentComments = async function () {
+  const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
+  const commentsContainer = document.getElementById('new-comment')
+  if (!serverURL || !commentsContainer) return
   const root = shokax_siteURL.replace(/^(https?:\/\/)?[^/]*/, '')
   let items = []
   const { comments } = await RecentComments({
-    serverURL: CONFIG.waline.serverURL.replace(/\/+$/, ''),
+    serverURL,
     count: 10
   })
   // @ts-ignore
@@ -84,5 +96,5 @@ export const walineRecentComments = async function () {
     newComments.appendChild(commentEl)
   })
 
-  document.getElementById("new-comment").appendChild(newComments)
+  commentsContainer.appendChild(newComments)
 }

@@ -1,4 +1,5 @@
 import { CONFIG } from '../globals/globalVars'
+import { waline_path } from '../library/waline_path'
 import { init, RecentComments } from '@waline/client'
 import { pageviewCount } from '@waline/client/pageview'
 // @ts-ignore
@@ -19,33 +20,6 @@ const shouldSkipLocalPageview = function () {
   return host === 'localhost' || host === '127.0.0.1' || host === '::1'
 }
 
-const normalizeWalinePath = function (rawPath: string) {
-  let p = (rawPath || '/').trim()
-  if (!p.startsWith('/')) p = '/' + p
-
-  // mergeByRoot:
-  // true  -> strip current root prefix so multilingual routes share one Waline key
-  // false -> keep original path so each language has independent keys
-  const mergeByRoot = (CONFIG.waline as any)?.mergeByRoot !== false
-  if (mergeByRoot) {
-    const cfgRoot = (CONFIG.root || '/').trim()
-    const normalizedRoot = cfgRoot.startsWith('/') ? cfgRoot : `/${cfgRoot}`
-    const rootNoTrailing = normalizedRoot.replace(/\/+$/, '')
-    if (rootNoTrailing && rootNoTrailing !== '/' && p.startsWith(rootNoTrailing + '/')) {
-      p = p.slice(rootNoTrailing.length)
-    } else if (rootNoTrailing && rootNoTrailing !== '/' && p === rootNoTrailing) {
-      p = '/'
-    }
-  }
-
-  if (!p) p = '/'
-
-  // normalize trailing index and slash
-  p = p.replace(/index\.html$/i, '')
-  if (!p.endsWith('/')) p += '/'
-  return p
-}
-
 const withCurrentRoot = function (rawPath: string) {
   let p = (rawPath || '/').trim()
   if (!p.startsWith('/')) p = '/' + p
@@ -61,6 +35,10 @@ const withCurrentRoot = function (rawPath: string) {
 
 export const walineComment = function () {
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
+  const path = waline_path(window.location.pathname, {
+    mergeByRoot: (CONFIG.waline as any)?.mergeByRoot !== false,
+    root: CONFIG.root
+  })
   init({
     el: '#comments',
     serverURL,
@@ -72,7 +50,7 @@ export const walineComment = function () {
     wordLimit: CONFIG.waline.wordLimit,
     pageSize: CONFIG.waline.pageSize,
     pageview: CONFIG.waline.pageview,
-    path: normalizeWalinePath(window.location.pathname),
+    path,
     recaptchaV3Key: CONFIG.waline.recaptchaV3Key,
     turnstileKey: CONFIG.waline.turnstileKey,
     dark: 'html[data-theme="dark"]'
@@ -83,9 +61,13 @@ export const walinePageview = function () {
   if (shouldSkipLocalPageview()) return
 
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
+  const path = waline_path(window.location.pathname, {
+    mergeByRoot: (CONFIG.waline as any)?.mergeByRoot !== false,
+    root: CONFIG.root
+  })
   pageviewCount({
     serverURL,
-    path: normalizeWalinePath(window.location.pathname)
+    path
   })
 }
 

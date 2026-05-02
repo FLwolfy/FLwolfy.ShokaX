@@ -195,6 +195,8 @@ waline:
   enable: true
   serverURL: "comment.flwolfy.xyz"
   lang: "zh-CN"
+  countLocalhost: false # 本地 localhost/127.0.0.1 访问是否计入 Waline 阅读量
+  mergeByRoot: true # true: 多语言共享同一评论/浏览量键；false: 各语言路径独立统计
   locale: {} # 本地化替换，详见 waline 文档 https://waline.js.org/guide/features/i18n.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AF%AD%E8%A8%80
   emoji: # 表情包，默认为 waline 官方配置
     - https://unpkg.com/@waline/emojis@1.0.1/weibo

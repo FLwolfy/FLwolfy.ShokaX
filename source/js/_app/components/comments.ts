@@ -11,6 +11,54 @@ const normalizeServerURL = function (url: string) {
   return `https://${trimmed}`
 }
 
+const shouldSkipLocalPageview = function () {
+  const allowLocal = (CONFIG.waline as any)?.countLocalhost === true
+  if (allowLocal) return false
+
+  const host = (window.location.hostname || '').toLowerCase()
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1'
+}
+
+const normalizeWalinePath = function (rawPath: string) {
+  let p = (rawPath || '/').trim()
+  if (!p.startsWith('/')) p = '/' + p
+
+  // mergeByRoot:
+  // true  -> strip current root prefix so multilingual routes share one Waline key
+  // false -> keep original path so each language has independent keys
+  const mergeByRoot = (CONFIG.waline as any)?.mergeByRoot !== false
+  if (mergeByRoot) {
+    const cfgRoot = (CONFIG.root || '/').trim()
+    const normalizedRoot = cfgRoot.startsWith('/') ? cfgRoot : `/${cfgRoot}`
+    const rootNoTrailing = normalizedRoot.replace(/\/+$/, '')
+    if (rootNoTrailing && rootNoTrailing !== '/' && p.startsWith(rootNoTrailing + '/')) {
+      p = p.slice(rootNoTrailing.length)
+    } else if (rootNoTrailing && rootNoTrailing !== '/' && p === rootNoTrailing) {
+      p = '/'
+    }
+  }
+
+  if (!p) p = '/'
+
+  // normalize trailing index and slash
+  p = p.replace(/index\.html$/i, '')
+  if (!p.endsWith('/')) p += '/'
+  return p
+}
+
+const withCurrentRoot = function (rawPath: string) {
+  let p = (rawPath || '/').trim()
+  if (!p.startsWith('/')) p = '/' + p
+
+  const cfgRoot = (CONFIG.root || '/').trim()
+  const normalizedRoot = cfgRoot.startsWith('/') ? cfgRoot : `/${cfgRoot}`
+  const rootNoTrailing = normalizedRoot.replace(/\/+$/, '')
+
+  if (!rootNoTrailing || rootNoTrailing === '/') return p
+  if (p === rootNoTrailing || p.startsWith(rootNoTrailing + '/')) return p
+  return `${rootNoTrailing}${p}`
+}
+
 export const walineComment = function () {
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
   init({
@@ -24,7 +72,7 @@ export const walineComment = function () {
     wordLimit: CONFIG.waline.wordLimit,
     pageSize: CONFIG.waline.pageSize,
     pageview: CONFIG.waline.pageview,
-    path: window.location.pathname,
+    path: normalizeWalinePath(window.location.pathname),
     recaptchaV3Key: CONFIG.waline.recaptchaV3Key,
     turnstileKey: CONFIG.waline.turnstileKey,
     dark: 'html[data-theme="dark"]'
@@ -32,10 +80,12 @@ export const walineComment = function () {
 }
 
 export const walinePageview = function () {
+  if (shouldSkipLocalPageview()) return
+
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
   pageviewCount({
     serverURL,
-    path: window.location.pathname
+    path: normalizeWalinePath(window.location.pathname)
   })
 }
 
@@ -53,7 +103,8 @@ export const walineRecentComments = async function () {
   comments.data.forEach(function (item) {
     let cText = (item.orig.length > 50) ? item.orig.substring(0, 50) + '...' : item.orig
     item.url = item.url.startsWith('/') ? item.url : '/' + item.url
-    const siteLink = item.url + '#' + item.objectId
+    const routedPath = withCurrentRoot(item.url)
+    const siteLink = routedPath + '#' + item.objectId
 
     const time = new Date(item.time)
     const now = new Date()

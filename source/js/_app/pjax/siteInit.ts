@@ -48,6 +48,24 @@ const siteInit = async () => {
   } else if (__shokax_pagefind_search__){
     const { initializePagefindSearch } = await import('shokax-uikit/components/pagefind/init')
     initializePagefindSearch('li.item.search')
+    if (!(window as any).__shokaxPagefindOutsideBound) {
+      (window as any).__shokaxPagefindOutsideBound = true
+      window.addEventListener('click', (event) => {
+        const panel = document.querySelector('.pagefind') as HTMLElement | null
+        if (!panel) return
+        if (getComputedStyle(panel).display === 'none') return
+        const target = event.target as Node
+        const trigger = document.querySelector('li.item.search')
+        if (panel.contains(target)) return
+        if (trigger && trigger.contains(target)) return
+        const closeBtn = panel.querySelector('.i-ri-close-line') as HTMLElement | null
+        // Close search without bubbling a second global click, to avoid affecting other widgets (e.g. track pad).
+        setTimeout(() => {
+          if (!closeBtn) return
+          closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: false, cancelable: true }))
+        }, 0)
+      })
+    }
   }
 
   if (__shokax_fireworks__) {

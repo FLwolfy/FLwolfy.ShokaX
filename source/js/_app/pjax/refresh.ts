@@ -53,14 +53,20 @@ export const siteRefresh = async (reload) => {
   const pagePost = await import('../page/post')
   await pagePost.postBeauty()
 
+  // Pageview should be available immediately after refresh/PJAX load.
+  if (__shokax_waline__) {
+    import('../components/comments').then(({ walinePageview }) => {
+      walinePageview()
+    })
+  }
+
   const cpel = document.getElementById('copyright')
   if (cpel) {
     const comment = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           if (__shokax_waline__) {
-            import('../components/comments').then(({walinePageview, walineComment}) => {
-              walinePageview()
+            import('../components/comments').then(({ walineComment }) => {
               walineComment()
             })
           }

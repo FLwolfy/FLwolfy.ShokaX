@@ -49,7 +49,8 @@ export const walineComment = function () {
     requiredMeta: CONFIG.waline.requiredMeta,
     wordLimit: CONFIG.waline.wordLimit,
     pageSize: CONFIG.waline.pageSize,
-    pageview: CONFIG.waline.pageview,
+    // Keep pageview counting in walinePageview() so localhost skipping works.
+    pageview: false,
     path,
     recaptchaV3Key: CONFIG.waline.recaptchaV3Key,
     turnstileKey: CONFIG.waline.turnstileKey,
@@ -58,16 +59,19 @@ export const walineComment = function () {
 }
 
 export const walinePageview = function () {
-  if (shouldSkipLocalPageview()) return
+  if (!CONFIG.waline.pageview) return
 
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
   const path = waline_path(window.location.pathname, {
     mergeByRoot: (CONFIG.waline as any)?.mergeByRoot !== false,
     root: CONFIG.root
   })
+  const localReadOnly = shouldSkipLocalPageview()
   pageviewCount({
     serverURL,
-    path
+    path,
+    // On localhost with countLocalhost=false, fetch count only without increment.
+    update: !localReadOnly
   })
 }
 

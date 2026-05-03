@@ -54,7 +54,7 @@ export const siteRefresh = async (reload) => {
   await pagePost.postBeauty()
 
   // Pageview should be available immediately after refresh/PJAX load.
-  if (__shokax_waline__) {
+  if (__shokax_waline__ && LOCAL.ispost) {
     import('../components/comments').then(({ walinePageview }) => {
       walinePageview()
     })

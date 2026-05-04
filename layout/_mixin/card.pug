@@ -1,8 +1,9 @@
 mixin CardRender(item)
     - itemname = item.name
+    - var coverSrc = item.cardCover || url_for(`${theme.statics}${item.slug}/cover.${getCoverExt(item.slug)}`)
 
     section(class="item")
-        div(class="cover" data-background-image=url_for(`${theme.statics}${item.slug}/cover.${getCoverExt(item.slug)}`))
+        div(class="cover" data-background-image=coverSrc)
             h2(class="title")
                 != itemname
             - var temp = item?.top?.name

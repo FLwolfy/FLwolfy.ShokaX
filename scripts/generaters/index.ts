@@ -3,12 +3,38 @@
 'use strict'
 
 import { readFile } from 'node:fs/promises'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import pagination from 'hexo-pagination'
 
 function getFileExtension(path) {
   const filename = path.split(/[\\/]/).pop() || ''; // 处理路径分隔符并获取文件名
   const lastDotIndex = filename.lastIndexOf('.');
   return lastDotIndex > 0 ? filename.slice(lastDotIndex + 1) : '';
+}
+
+function isRemoteUrl(value: string) {
+  return /^https?:\/\//i.test(value) || /^\/\//.test(value)
+}
+
+function loadCategorySlugMapFromTree() {
+  const map = {}
+  try {
+    const treePath = join(process.cwd(), 'category-tree.json')
+    if (!existsSync(treePath)) return map
+    const raw = readFileSync(treePath, 'utf8')
+    const json = JSON.parse(raw)
+    const categories = Array.isArray(json?.categories) ? json.categories : []
+
+    for (const c1 of categories) {
+      if (c1 && c1.name && c1.slug) map[String(c1.name)] = String(c1.slug)
+      const children = Array.isArray(c1?.children) ? c1.children : []
+      for (const c2 of children) {
+        if (c2 && c2.name && c2.slug) map[String(c2.name)] = String(c2.slug)
+      }
+    }
+  } catch (_) {}
+  return map
 }
 
 hexo.config.index_generator = Object.assign({
@@ -43,6 +69,17 @@ hexo.extend.generator.register('index',async function (locals) {
   const path = config.index_generator.path || ''
   const categories = locals.categories
   const theme = hexo.theme.config
+  const themeCards = Array.isArray(theme?.homeConfig?.cateCards) ? theme.homeConfig.cateCards : []
+  const cardMap = new Map<string, string>()
+  themeCards.forEach((card) => {
+    if (!card || !card.slug || !card.cover) return
+    cardMap.set(String(card.slug).toLowerCase(), String(card.cover))
+  })
+  const configCategoryMap = config?.category_map || {}
+  const treeCategoryMap = loadCategorySlugMapFromTree()
+  const resolveCategorySlug = function (cat) {
+    return String(configCategoryMap?.[cat.name] || treeCategoryMap?.[cat.name] || cat.slug || '')
+  }
 
   const getTopcat = function (cat) {
     if (cat.parent) {
@@ -56,20 +93,22 @@ hexo.extend.generator.register('index',async function (locals) {
   if (categories && categories.length) {
     await Promise.all(
       categories.map(async (cat) => {
-        const cover = `source/_posts/${cat.slug}`
-        if (theme.homeConfig.cateCards.length > 0) {
-          const cardMap = new Map<string, string>()
-          theme.homeConfig.cateCards.forEach((card) => {
-            cardMap.set(card.slug, card.cover)
-          })
-
-          if (cardMap.has(cat.slug)) {
-            const cover = cardMap.get(cat.slug)
-            const coverData = await readFile(`source/_posts/${cover}`)
-            covers.push({
-              path: `${cat.slug}/cover.${getFileExtension(cover)}`,
-              data: coverData
-            })
+        if (cardMap.size > 0) {
+          const cardSlug = resolveCategorySlug(cat)
+          const cover = cardMap.get(String(cardSlug).toLowerCase())
+          if (cover) {
+            if (isRemoteUrl(cover)) {
+              cat.cardCover = cover
+            } else {
+              const coverData = await readFile(`source/_posts/${cover}`)
+              const ext = getFileExtension(cover)
+              const cardCoverPath = `${cardSlug}/cover.${ext}`
+              covers.push({
+                path: cardCoverPath,
+                data: coverData
+              })
+              cat.cardCover = `/${cardCoverPath}`
+            }
 
             const topcat = getTopcat(cat)
 

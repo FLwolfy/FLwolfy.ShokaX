@@ -16,6 +16,8 @@ block content
                 div(class="segments sticky")
                     each post in sticky
                         +SMRender(post, false)
+            
+            p Debug catlist length: #{page.catlist ? page.catlist.length : 'undefined'}
             if page.catlist.length > 0
                 h2(class="divider")
                     != __('index.category')

@@ -8,6 +8,74 @@ import { positionInit } from '../globals/tools'
 import { menuActive, sideBarTab, sidebarTOC } from '../components/sidebar'
 import { Loader, isOutime } from '../globals/thirdparty'
 import { tabFormat } from '../page/tab'
+import { pageScroll } from '../library/anime'
+
+const hasCommentTarget = function () {
+  const commentId = new URLSearchParams(window.location.search).get('comment')
+  return !!commentId || /^#[0-9a-f]{16,32}$/i.test(window.location.hash)
+}
+
+const getCommentTargetId = function () {
+  return new URLSearchParams(window.location.search).get('comment') || decodeURIComponent(window.location.hash.slice(1))
+}
+
+const waitForCommentTarget = function (targetId: string, timeout = 6000) {
+  return new Promise<HTMLElement | null>((resolve) => {
+    if (!targetId) {
+      resolve(null)
+      return
+    }
+
+    const current = document.getElementById(targetId)
+    if (current) {
+      resolve(current)
+      return
+    }
+
+    const commentsEl = document.getElementById('comments')
+    if (!commentsEl) {
+      resolve(null)
+      return
+    }
+
+    let done = false
+    let pollTimer:number
+    const finish = (target: HTMLElement | null) => {
+      if (done) return
+      done = true
+      observer?.disconnect()
+      window.clearTimeout(timer)
+      window.clearInterval(pollTimer)
+      resolve(target)
+    }
+    const check = () => {
+      const target = document.getElementById(targetId)
+      if (target) finish(target)
+    }
+    const observer = window.MutationObserver ? new MutationObserver(check) : null
+    const timer = window.setTimeout(() => finish(document.getElementById(targetId)), timeout)
+    pollTimer = window.setInterval(check, 100)
+
+    observer?.observe(commentsEl, {
+      childList: true,
+      subtree: true
+    })
+  })
+}
+
+const clearCommentUrlTarget = function () {
+  if (!window.history?.replaceState) return
+
+  const url = new URL(window.location.href)
+  url.searchParams.delete('comment')
+  url.hash = ''
+  window.history.replaceState(null, '', `${url.pathname}${url.search}`)
+}
+
+const scrollToCommentTarget = async function () {
+  const target = await waitForCommentTarget(getCommentTargetId())
+  if (target) pageScroll(target, undefined, clearCommentUrlTarget)
+}
 
 export const siteRefresh = async (reload) => {
   if (__shokax_antiFakeWebsite__) {
@@ -53,11 +121,22 @@ export const siteRefresh = async (reload) => {
   const pagePost = await import('../page/post')
   await pagePost.postBeauty()
 
-  // Pageview should be available immediately after refresh/PJAX load.
-  if (__shokax_waline__ && LOCAL.ispost) {
-    import('../components/comments').then((comments) => {
-      if (typeof comments.walinePageview === 'function') comments.walinePageview()
-    })
+  const shouldLoadCommentsImmediately = __shokax_waline__ && !!document.getElementById('comments') && hasCommentTarget()
+
+  if (__shokax_waline__ && (LOCAL.ispost || shouldLoadCommentsImmediately)) {
+    const comments = await import('../components/comments')
+
+    // Pageview should be available immediately after refresh/PJAX load.
+    if (LOCAL.ispost && typeof comments.walinePageview === 'function') {
+      comments.walinePageview()
+    }
+
+    if (shouldLoadCommentsImmediately) {
+      if (typeof comments.walineComment === 'function') {
+        comments.walineComment()
+      }
+      await scrollToCommentTarget()
+    }
   }
 
   const cpel = document.getElementById('copyright')

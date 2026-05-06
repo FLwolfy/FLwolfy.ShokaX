@@ -1,6 +1,7 @@
 import { CONFIG } from '../globals/globalVars'
 import { init, RecentComments } from '@waline/client'
 import { pageviewCount } from '@waline/client/pageview'
+import { pageScroll } from '../library/anime'
 // @ts-ignore
 await import('@waline/client/style')
 
@@ -60,8 +61,86 @@ const fetchRecentCommentsDirectly = async function (serverURL: string) {
   return res.json()
 }
 
+const waitForCommentTarget = function (targetId: string, timeout = 6000) {
+  return new Promise<HTMLElement | null>((resolve) => {
+    if (!targetId) {
+      resolve(null)
+      return
+    }
+
+    const current = document.getElementById(targetId)
+    if (current) {
+      resolve(current)
+      return
+    }
+
+    const commentsEl = document.getElementById('comments')
+    if (!commentsEl) {
+      resolve(null)
+      return
+    }
+
+    let done = false
+    let pollTimer:number
+    const finish = (target: HTMLElement | null) => {
+      if (done) return
+      done = true
+      observer?.disconnect()
+      window.clearTimeout(timer)
+      window.clearInterval(pollTimer)
+      resolve(target)
+    }
+    const check = () => {
+      const target = document.getElementById(targetId)
+      if (target) finish(target)
+    }
+    const observer = window.MutationObserver ? new MutationObserver(check) : null
+    const timer = window.setTimeout(() => finish(document.getElementById(targetId)), timeout)
+    pollTimer = window.setInterval(check, 100)
+
+    observer?.observe(commentsEl, {
+      childList: true,
+      subtree: true
+    })
+  })
+}
+
+const clearCommentUrlTarget = function () {
+  if (!window.history?.replaceState) return
+
+  const url = new URL(window.location.href)
+  url.searchParams.delete('comment')
+  url.hash = ''
+  window.history.replaceState(null, '', `${url.pathname}${url.search}`)
+}
+
+const jumpToCurrentArticleComment = async function (event: MouseEvent, href: string) {
+  let url: URL
+  try {
+    url = new URL(href, window.location.href)
+  } catch (e) {
+    return
+  }
+
+  if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || !url.hash) return
+
+  event.preventDefault()
+  const targetId = decodeURIComponent(url.hash.slice(1))
+  window.history.replaceState(null, '', url.hash)
+  walineComment()
+
+  const target = await waitForCommentTarget(targetId)
+  if (target) {
+    pageScroll(target, undefined, clearCommentUrlTarget)
+  }
+}
+
 export const walineComment = function () {
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
+  const commentsEl = document.getElementById('comments')
+  if (!serverURL || !commentsEl || commentsEl.dataset.walineMounted === 'true') return
+
+  commentsEl.dataset.walineMounted = 'true'
   init({
     el: '#comments',
     serverURL,
@@ -154,6 +233,9 @@ export const walineRecentComments = async function () {
     commentTime.className = 'breadcrumb'
     commentTime.innerText = `${item.nick} @ ${item.time}`
     commentLink.href = root + item.href
+    commentLink.addEventListener('click', (event) => {
+      jumpToCurrentArticleComment(event, commentLink.href).catch(console.error)
+    })
     commentEl.className = 'item'
 
     commentText.appendChild(document.createElement('br'))

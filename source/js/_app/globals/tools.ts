@@ -40,7 +40,11 @@ export const positionInit = (comment?: boolean) => {
   }
 
   if (anchor) {
-    target = document.querySelector(decodeURI(anchor))
+    try {
+      target = document.getElementById(decodeURIComponent(anchor.slice(1)))
+    } catch (e) {
+      target = null
+    }
   } else {
     target = CONFIG.auto_scroll ? parseInt(localStorage.getItem(LOCAL_URL)) : 0
   }

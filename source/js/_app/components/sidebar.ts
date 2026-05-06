@@ -183,6 +183,26 @@ export const sidebarTOC = () => {
 
   const tocElement = sideBar.querySelector('.contents.panel')
 
+  const findIndexByScroll = () => {
+    const nav = document.getElementById('nav')
+    const navHeight = nav ? nav.offsetHeight : 0
+    let index = 0
+
+    sections.forEach((element, currentIndex) => {
+      if (!element) return
+      if (element.getBoundingClientRect().top - navHeight <= 1) {
+        index = currentIndex
+      }
+    })
+
+    return index
+  }
+
+  const syncActiveByScroll = () => {
+    if (activeLock !== null) return
+    activateNavByIndex(findIndexByScroll())
+  }
+
   const findIndex = (entries: IntersectionObserverEntry[]) => {
     let index = 0
     let entry = entries[index]
@@ -217,6 +237,25 @@ export const sidebarTOC = () => {
   }
 
   createIntersectionObserver()
+
+  const tocWindow = window as any
+  if (tocWindow.__shokaxTocScrollSync) {
+    window.removeEventListener('scroll', tocWindow.__shokaxTocScrollSync)
+  }
+  if (tocWindow.__shokaxTocScrollEndSync) {
+    window.removeEventListener('scrollend', tocWindow.__shokaxTocScrollEndSync)
+  }
+
+  let scrollSyncTimer:number
+  const scheduleScrollSync = () => {
+    window.clearTimeout(scrollSyncTimer)
+    scrollSyncTimer = window.setTimeout(syncActiveByScroll, 120)
+  }
+
+  tocWindow.__shokaxTocScrollSync = scheduleScrollSync
+  tocWindow.__shokaxTocScrollEndSync = syncActiveByScroll
+  window.addEventListener('scroll', scheduleScrollSync, { passive: true })
+  window.addEventListener('scrollend', syncActiveByScroll, { passive: true })
 }
 
 export const backToTopHandle = () => {

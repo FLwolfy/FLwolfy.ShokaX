@@ -1,5 +1,4 @@
 import { CONFIG } from '../globals/globalVars'
-import { waline_path } from '../library/waline_path'
 import { init, RecentComments } from '@waline/client'
 import { pageviewCount } from '@waline/client/pageview'
 // @ts-ignore
@@ -35,10 +34,6 @@ const withCurrentRoot = function (rawPath: string) {
 
 export const walineComment = function () {
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
-  const path = waline_path(window.location.pathname, {
-    mergeByRoot: (CONFIG.waline as any)?.mergeByRoot !== false,
-    root: CONFIG.root
-  })
   init({
     el: '#comments',
     serverURL,
@@ -51,7 +46,7 @@ export const walineComment = function () {
     pageSize: CONFIG.waline.pageSize,
     // Keep pageview counting in walinePageview() so localhost skipping works.
     pageview: false,
-    path,
+    path: window.location.pathname,
     recaptchaV3Key: CONFIG.waline.recaptchaV3Key,
     turnstileKey: CONFIG.waline.turnstileKey,
     dark: 'html[data-theme="dark"]'
@@ -62,14 +57,10 @@ export const walinePageview = function () {
   if (!CONFIG.waline.pageview) return
 
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
-  const path = waline_path(window.location.pathname, {
-    mergeByRoot: (CONFIG.waline as any)?.mergeByRoot !== false,
-    root: CONFIG.root
-  })
   const localReadOnly = shouldSkipLocalPageview()
   pageviewCount({
     serverURL,
-    path,
+    path: window.location.pathname,
     // On localhost with countLocalhost=false, fetch count only without increment.
     update: !localReadOnly
   })

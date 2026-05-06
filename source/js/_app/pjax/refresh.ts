@@ -55,8 +55,8 @@ export const siteRefresh = async (reload) => {
 
   // Pageview should be available immediately after refresh/PJAX load.
   if (__shokax_waline__ && LOCAL.ispost) {
-    import('../components/comments').then(({ walinePageview }) => {
-      walinePageview()
+    import('../components/comments').then((comments) => {
+      if (typeof comments.walinePageview === 'function') comments.walinePageview()
     })
   }
 
@@ -66,8 +66,8 @@ export const siteRefresh = async (reload) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           if (__shokax_waline__) {
-            import('../components/comments').then(({ walineComment }) => {
-              walineComment()
+            import('../components/comments').then((comments) => {
+              if (typeof comments.walineComment === 'function') comments.walineComment()
             })
           }
           if (__shokax_twikoo__) {
@@ -87,9 +87,34 @@ export const siteRefresh = async (reload) => {
   }
 
   if (__shokax_waline__) {
-    import('../components/comments').then(async ({walineRecentComments}) => {
-      await walineRecentComments()
-    })
+    const loadRecentComments = () => {
+      import('../components/comments').then(async (comments) => {
+        if (typeof comments.walineRecentComments !== 'function') return
+        await comments.walineRecentComments().catch(console.error)
+      }).catch(console.error)
+    }
+
+    loadRecentComments()
+
+    window.setTimeout(() => {
+      const recentComments = document.getElementById('new-comment')
+      if (recentComments && recentComments.childElementCount === 0) loadRecentComments()
+    }, 500)
+
+    const recentComments = document.getElementById('new-comment')
+    if (recentComments && window.IntersectionObserver) {
+      const recentObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          if (recentComments.childElementCount === 0) loadRecentComments()
+          recentObserver.disconnect()
+        })
+      }, {
+        root: null,
+        threshold: 0.1
+      })
+      recentObserver.observe(recentComments)
+    }
   }
 
   if (__shokax_twikoo__) {

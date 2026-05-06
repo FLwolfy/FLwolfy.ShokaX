@@ -32,6 +32,34 @@ const withCurrentRoot = function (rawPath: string) {
   return `${rootNoTrailing}${p}`
 }
 
+const toPlainText = function (value: string) {
+  const el = document.createElement('div')
+  el.innerHTML = value
+  el.querySelectorAll('img[alt]').forEach((img) => {
+    img.replaceWith(document.createTextNode((img as HTMLImageElement).alt))
+  })
+  return (el.textContent || el.innerText || value).trim()
+}
+
+const normalizeRecentComments = function (payload: any) {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.comments)) return payload.comments
+  if (Array.isArray(payload?.comments?.data)) return payload.comments.data
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.data)) return payload.data.data
+  return []
+}
+
+const fetchRecentCommentsDirectly = async function (serverURL: string) {
+  const url = `${serverURL.replace(/\/+$/, '')}/api/comment?type=recent&count=10&lang=${encodeURIComponent(CONFIG.waline.lang || navigator.language)}`
+  const res = await fetch(url, {
+    cache: 'no-store',
+    credentials: 'omit'
+  })
+  if (!res.ok) throw new Error(`Waline recent comments failed: ${res.status}`)
+  return res.json()
+}
+
 export const walineComment = function () {
   const serverURL = normalizeServerURL(CONFIG.waline.serverURL)
   init({
@@ -72,16 +100,25 @@ export const walineRecentComments = async function () {
   if (!serverURL || !commentsContainer) return
   const root = shokax_siteURL.replace(/^(https?:\/\/)?[^/]*/, '')
   let items = []
-  const { comments } = await RecentComments({
+  const recentComments = await RecentComments({
     serverURL,
     count: 10
   })
-  // @ts-ignore
-  comments.data.forEach(function (item) {
-    let cText = (item.orig.length > 50) ? item.orig.substring(0, 50) + '...' : item.orig
-    item.url = item.url.startsWith('/') ? item.url : '/' + item.url
-    const routedPath = withCurrentRoot(item.url)
-    const siteLink = routedPath + '#' + item.objectId
+
+  let comments = normalizeRecentComments(recentComments)
+  let directComments = null
+
+  if (!comments.length) {
+    directComments = await fetchRecentCommentsDirectly(serverURL).catch(() => null)
+    comments = normalizeRecentComments(directComments)
+  }
+
+  comments.forEach(function (item: any) {
+    const rawText = toPlainText(String(item.orig || item.comment || item.commentText || ''))
+    let cText = (rawText.length > 50) ? rawText.substring(0, 50) + '...' : rawText
+    const rawUrl = String(item.url || item.path || '/')
+    const routedPath = withCurrentRoot(rawUrl)
+    const siteLink = routedPath + (item.objectId ? '#' + item.objectId : '')
 
     const time = new Date(item.time)
     const now = new Date()
@@ -99,12 +136,14 @@ export const walineRecentComments = async function () {
 
     items.push({
       href: siteLink,
-      nick: item.nick,
+      nick: item.nick || item.nickName || '匿名',
       time: dateStr,
       text: cText
     })
   })
   const newComments = new DocumentFragment()
+  commentsContainer.textContent = ''
+  commentsContainer.dataset.loaded = String(items.length)
   items.forEach(function (item) {
     const commentEl = document.createElement('li')
     const commentLink = document.createElement('a')

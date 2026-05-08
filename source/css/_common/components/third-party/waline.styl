@@ -63,3 +63,23 @@
     --waline-info-color: var(--grey-6);
   }
 }
+
+/* 修复评论输入框在特定尺寸下出现异常红线 */
+#comments {
+  .wl-editor,
+  .wl-input {
+    background-image: none !important;
+    box-shadow: none;
+    text-decoration: none;
+    -webkit-appearance: none;
+    appearance: none;
+    padding-left: .65rem;
+    padding-right: .65rem;
+    box-sizing: border-box;
+  }
+
+  .wl-editor:focus,
+  .wl-input:focus {
+    box-shadow: 0 0 0 1px var(--waline-active-color) inset !important;
+  }
+}

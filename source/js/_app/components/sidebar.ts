@@ -182,15 +182,21 @@ export const sidebarTOC = () => {
   })
 
   const tocElement = sideBar.querySelector('.contents.panel')
+  const TOC_ACTIVATION_RATIO = 0.7
+
+  // 当标题进入视口激活线以上时，认为该标题激活
+  // 0.5 = 正中线；适度下移到 0.58，避免体感“要到很上方才切换”
+  const getActivationLine = () => {
+    return window.innerHeight * TOC_ACTIVATION_RATIO
+  }
 
   const findIndexByScroll = () => {
-    const nav = document.getElementById('nav')
-    const navHeight = nav ? nav.offsetHeight : 0
+    const activationLine = getActivationLine()
     let index = 0
 
     sections.forEach((element, currentIndex) => {
       if (!element) return
-      if (element.getBoundingClientRect().top - navHeight <= 1) {
+      if (element.getBoundingClientRect().top <= activationLine) {
         index = currentIndex
       }
     })
@@ -223,7 +229,7 @@ export const sidebarTOC = () => {
 
   const createIntersectionObserver = () => {
     const observer = new IntersectionObserver((entries) => {
-      const index = findIndex(entries) + (diffY < 0 ? 1 : 0)
+      const index = Math.max(0, Math.min(findIndexByScroll(), sections.length - 1))
       if (activeLock === null) {
         activateNavByIndex(index)
       }

@@ -209,41 +209,6 @@ export const sidebarTOC = () => {
     activateNavByIndex(findIndexByScroll())
   }
 
-  const findIndex = (entries: IntersectionObserverEntry[]) => {
-    let index = 0
-    let entry = entries[index]
-
-    if (entry.boundingClientRect.top > 0) {
-      index = sections.indexOf(entry.target as HTMLElement)
-      return index === 0 ? 0 : index - 1
-    }
-    for (; index < entries.length; index++) {
-      if (entries[index].boundingClientRect.top <= 0) {
-        entry = entries[index]
-      } else {
-        return sections.indexOf(entry.target as HTMLElement)
-      }
-    }
-    return sections.indexOf(entry.target as HTMLElement)
-  }
-
-  const createIntersectionObserver = () => {
-    const observer = new IntersectionObserver((entries) => {
-      const index = Math.max(0, Math.min(findIndexByScroll(), sections.length - 1))
-      if (activeLock === null) {
-        activateNavByIndex(index)
-      }
-    }, {
-      rootMargin: '0px 0px -100% 0px', threshold: 0
-    })
-
-    sections.forEach((element) => {
-      element && observer.observe(element)
-    })
-  }
-
-  createIntersectionObserver()
-
   const tocWindow = window as any
   if (tocWindow.__shokaxTocScrollSync) {
     window.removeEventListener('scroll', tocWindow.__shokaxTocScrollSync)
@@ -252,10 +217,13 @@ export const sidebarTOC = () => {
     window.removeEventListener('scrollend', tocWindow.__shokaxTocScrollEndSync)
   }
 
-  let scrollSyncTimer:number
+  let scrollSyncRaf = 0
   const scheduleScrollSync = () => {
-    window.clearTimeout(scrollSyncTimer)
-    scrollSyncTimer = window.setTimeout(syncActiveByScroll, 120)
+    if (scrollSyncRaf) return
+    scrollSyncRaf = window.requestAnimationFrame(() => {
+      scrollSyncRaf = 0
+      syncActiveByScroll()
+    })
   }
 
   tocWindow.__shokaxTocScrollSync = scheduleScrollSync

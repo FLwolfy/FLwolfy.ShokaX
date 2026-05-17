@@ -15,6 +15,69 @@
     margin-top: 2.5rem;
     text-align: center;
   }
+
+  .shiki-fold {
+    position: relative;
+    margin: 1rem 0;
+
+    &::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 5rem;
+      background: linear-gradient(to bottom, transparent, var(--grey-1));
+      pointer-events: none;
+      border-radius: 0 0 .5rem .5rem;
+      transition: opacity .22s ease;
+    }
+
+    &.open::after {
+      opacity: 0;
+    }
+
+    &.open .shiki-fold-toggle .ic {
+      transform: rotate(180deg);
+    }
+  }
+
+  .shiki-fold-target {
+    display: block;
+    overflow: hidden;
+    transition: max-height .24s ease;
+  }
+
+  .shiki-fold-toggle {
+    position: absolute;
+    z-index: 2;
+    right: 50%;
+    bottom: .65rem;
+    width: 2.4rem;
+    height: 1.55rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--grey-2-a7);
+    color: var(--text-color);
+    box-shadow: 0 .2rem .65rem var(--box-bg-shadow);
+    cursor: pointer;
+    transform: translateX(50%);
+    backdrop-filter: blur(.35rem);
+    -webkit-backdrop-filter: blur(.35rem);
+    transition: background .2s ease, color .2s ease, transform .2s ease;
+
+    &:hover {
+      background: var(--color-pink-a3);
+      color: var(--color-pink);
+    }
+
+    .ic {
+      display: inline-block;
+      line-height: 1.55rem;
+      transition: transform .24s ease;
+    }
+  }
 }
 
 

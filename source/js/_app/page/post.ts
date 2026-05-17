@@ -5,6 +5,94 @@ import { pageScroll, transition } from '../library/anime'
 import { getDisplay, setDisplay, wrapObject } from '../library/proto'
 import { initializeCodeBlock } from 'shokax-uikit/components/codeblock/init'
 
+const SHIKI_FOLD_MAX_HEIGHT = 360
+const SHIKI_FOLD_LINE_THRESHOLD = 15
+
+function getShikiLineCount(block: HTMLElement) {
+  const root = block.shadowRoot
+  const lines = root?.querySelectorAll('.line').length || 0
+  if (lines > 0) return lines
+
+  const content = block.getAttribute('content') || ''
+  const contentLines = content.match(/class=(["'])[^"']*\bline\b[^"']*\1/g)?.length || 0
+  if (contentLines > 0) return contentLines
+
+  const text = root?.textContent || block.textContent || ''
+  return text ? text.split('\n').length : 0
+}
+
+function getShikiContentHeight(block: HTMLElement) {
+  const root = block.shadowRoot
+  const code = root?.querySelector<HTMLElement>('.codeblock')
+  return Math.max(block.scrollHeight, code?.scrollHeight || 0)
+}
+
+function initShikiCodeFold(retry = 0) {
+  const blocks = document.querySelectorAll<HTMLElement>('code-block')
+  let hasPendingBlock = false
+
+  blocks.forEach((block) => {
+    if (block.dataset.foldBound === '1' || block.closest('.shiki-fold')) return
+
+    const lineCount = getShikiLineCount(block)
+    const fullHeight = getShikiContentHeight(block)
+    const shouldFoldByLines = lineCount > SHIKI_FOLD_LINE_THRESHOLD
+    const shouldFoldByHeight = fullHeight > SHIKI_FOLD_MAX_HEIGHT
+
+    if (!fullHeight && !shouldFoldByLines) {
+      hasPendingBlock = true
+      return
+    }
+
+    if (!shouldFoldByLines && !shouldFoldByHeight) return
+
+    const wrapper = document.createElement('div')
+    wrapper.className = 'shiki-fold'
+    if (!block.parentNode) return
+    block.parentNode.insertBefore(wrapper, block)
+    wrapper.appendChild(block)
+
+    block.dataset.foldBound = '1'
+    block.classList.add('shiki-fold-target')
+    block.style.maxHeight = `${SHIKI_FOLD_MAX_HEIGHT}px`
+
+    const toggle = document.createElement('button')
+    toggle.className = 'shiki-fold-toggle'
+    toggle.type = 'button'
+    toggle.setAttribute('aria-label', 'Expand code block')
+    toggle.innerHTML = '<i class="ic i-angle-down"></i>'
+    wrapper.appendChild(toggle)
+
+    toggle.addEventListener('click', () => {
+      const isOpen = wrapper.classList.contains('open')
+
+      if (isOpen) {
+        block.style.maxHeight = `${getShikiContentHeight(block) || block.scrollHeight}px`
+        requestAnimationFrame(() => {
+          wrapper.classList.remove('open')
+          toggle.setAttribute('aria-label', 'Expand code block')
+          block.style.maxHeight = `${SHIKI_FOLD_MAX_HEIGHT}px`
+        })
+        pageScroll(wrapper)
+        return
+      }
+
+      wrapper.classList.add('open')
+      toggle.setAttribute('aria-label', 'Collapse code block')
+      block.style.maxHeight = `${getShikiContentHeight(block) || block.scrollHeight}px`
+      window.setTimeout(() => {
+        if (wrapper.classList.contains('open')) {
+          block.style.maxHeight = ''
+        }
+      }, 260)
+    })
+  })
+
+  if (hasPendingBlock && retry < 10) {
+    window.setTimeout(() => initShikiCodeFold(retry + 1), 100)
+  }
+}
+
 export const postBeauty = async () => {
   if (!document.querySelector('.md')) { return }
 
@@ -248,4 +336,7 @@ export const postBeauty = async () => {
   }
 
   initializeCodeBlock('.shiki')
+  requestAnimationFrame(() => initShikiCodeFold())
+  customElements.whenDefined('code-block')
+    .then(() => window.setTimeout(() => initShikiCodeFold(), 0))
 }

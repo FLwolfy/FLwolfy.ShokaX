@@ -89,11 +89,27 @@ export const transition = (target: HTMLElement, type: number|string|Function, co
   }, animation)).play()
 }
 
+interface ScrollAnimation {
+  frameId: number
+  cancel: () => void
+}
+
+const scrollAnimations = new WeakMap<HTMLElement, ScrollAnimation>()
+const scrollKeys = new Set([
+  'ArrowDown',
+  'ArrowUp',
+  'End',
+  'Home',
+  'PageDown',
+  'PageUp',
+  ' '
+])
+
 export const pageScroll = (target: HTMLElement | number, offset?: number, complete?: Function) => {
   // 确定滚动容器
   const scrollContainer = (typeof offset === 'number' && typeof target !== 'number')
     ? target.parentNode as HTMLElement
-    : document.scrollingElement || document.documentElement;
+    : (document.scrollingElement || document.documentElement) as HTMLElement;
 
   // 计算目标滚动位置
   let scrollTop: number;
@@ -108,14 +124,70 @@ export const pageScroll = (target: HTMLElement | number, offset?: number, comple
     scrollTop = 0;
   }
 
-  // 执行平滑滚动
-  scrollContainer.scrollTo({
-    top: scrollTop,
-    behavior: 'smooth'
-  });
+  const maxScroll = Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight)
+  const destination = Math.min(Math.max(scrollTop, 0), maxScroll)
+  const start = scrollContainer.scrollTop
+  const distance = destination - start
+  const previousAnimation = scrollAnimations.get(scrollContainer)
 
-  // 处理完成回调（模拟动画持续时间）
-  if (complete) {
-    setTimeout(() => complete(), 500); // 与原动画持续时间保持一致
+  if (previousAnimation) {
+    previousAnimation.cancel()
   }
+
+  if (Math.abs(distance) < 1) {
+    scrollContainer.scrollTop = destination
+    complete && complete()
+    return
+  }
+
+  // Keep every programmed jump visibly slower than the page's loading transition.
+  const duration = Math.min(1800, 900 + Math.abs(distance) * .18)
+  const startTime = performance.now()
+  const easeInOutQuad = (progress: number) => progress < .5
+    ? 2 * progress * progress
+    : 1 - Math.pow(-2 * progress + 2, 2) / 2
+
+  const animation: ScrollAnimation = {
+    frameId: 0,
+    cancel: () => {}
+  }
+  const cancel = () => {
+    cancelAnimationFrame(animation.frameId)
+    window.removeEventListener('wheel', cancel, true)
+    window.removeEventListener('touchstart', cancel, true)
+    window.removeEventListener('pointerdown', cancelOnMiddleClick, true)
+    document.removeEventListener('keydown', cancelOnScrollKey, true)
+    if (scrollAnimations.get(scrollContainer) === animation) {
+      scrollAnimations.delete(scrollContainer)
+    }
+  }
+  const cancelOnScrollKey = (event: KeyboardEvent) => {
+    if (scrollKeys.has(event.key)) cancel()
+  }
+  const cancelOnMiddleClick = (event: PointerEvent) => {
+    if (event.button === 1) cancel()
+  }
+  animation.cancel = cancel
+
+  window.addEventListener('wheel', cancel, { capture: true, passive: true })
+  window.addEventListener('touchstart', cancel, { capture: true, passive: true })
+  window.addEventListener('pointerdown', cancelOnMiddleClick, true)
+  document.addEventListener('keydown', cancelOnScrollKey, true)
+
+  const animateScroll = (now: number) => {
+    const progress = Math.min((now - startTime) / duration, 1)
+    scrollContainer.scrollTop = start + distance * easeInOutQuad(progress)
+
+    if (progress < 1) {
+      animation.frameId = requestAnimationFrame(animateScroll)
+      return
+    }
+
+    cancel()
+    scrollContainer.scrollTop = destination
+    complete && complete()
+  }
+
+  scrollAnimations.set(scrollContainer, animation)
+  animation.frameId = requestAnimationFrame(animateScroll)
 };

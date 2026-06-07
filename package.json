@@ -25,7 +25,6 @@
         "algoliasearch": "5.34.1",
         "es-toolkit": "^1.39.8",
         "esbuild": "^0.25.8",
-        "hana-img-viewer": "^1.2.3",
         "hexo": "^7.3.0",
         "hexo-algoliasearch": "^2.0.1",
         "hexo-feed": "^1.1.2",

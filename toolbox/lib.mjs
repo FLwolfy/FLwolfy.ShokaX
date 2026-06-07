@@ -47,10 +47,10 @@ export async function hoistDeps() {
     pm = "npm install"
   }
   console.log(`Using ${pm} to hoist dependencies.`)
-  // TODO 使用本地 package.json 解析
-  const res = await (await fetch('https://registry.npmmirror.com/hexo-theme-shokax')).json()
-  const latestV = res['dist-tags'].latest
-  const deps = res.versions[latestV].dependencies
+  const themePackage = JSON.parse(
+    await fs.readFile(new URL('../package.json', import.meta.url), 'utf8')
+  )
+  const deps = themePackage.dependencies || {}
   const depsList = Object.keys(deps).map(d => `${d}@${deps[d]}`)
   child_process.exec(`${pm} ${depsList.join(' ')}`.trim(), {
     cwd: hexoRoot

@@ -1,7 +1,8 @@
 #sidebar {
   min-height: 100vh;
   position: static;
-  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: scroll;
   width: $sidebar-desktop;
   top: 0;
   bottom: 0;
@@ -30,6 +31,8 @@
   >.inner {
     position: relative;
     width: $sidebar-desktop;
+    max-width: $sidebar-desktop;
+    min-width: 0;
     min-height: 100vh;
     height: 100vh;
     color: var(--grey-6);
@@ -43,23 +46,29 @@
 }
 
 .panels {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
   padding: 3.25rem 0 .75rem;
   width: 100%;
+  max-width: 100%;
   overflow: hidden;
 
   .inner {
+    box-sizing: border-box;
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
     margin-top: .75rem;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    width: auto;
+    width: 100%;
+    max-width: 100%;
     height: auto;
 
     box-shadow: none;
@@ -91,7 +100,11 @@
   }
 
   .panel {
+    box-sizing: border-box;
     display: none;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
     padding: .875rem .9375rem 2rem;
   }
 }

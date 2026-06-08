@@ -1,8 +1,12 @@
 .contents {
   ol {
 
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
     padding: 0 .125rem .3125rem .625rem;
     text-align: left;
+    width: 100%;
 
     >ol {
       padding-left: 0;
@@ -12,13 +16,29 @@
   .toc-item {
     font-size: $font-size-medium;
     line-height: 1.8;
+    max-width: 100%;
+    min-width: 0;
     overflow: hidden;
+  }
+
+  .toc-link {
+    box-sizing: border-box;
+    display: block;
+    max-width: none;
+    min-width: 0;
+    overflow: hidden;
+    padding-right: .35rem;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: 100%;
   }
 
   .toc-child {
+    box-sizing: border-box;
     display: none;
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
   }
 
   .active>.toc-child {

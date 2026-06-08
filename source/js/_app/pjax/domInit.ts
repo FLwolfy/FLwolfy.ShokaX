@@ -1,4 +1,4 @@
-import { backToTopHandle, goToBottomHandle, goToCommentHandle, sideBarToggleHandle } from '../components/sidebar'
+import { backToTopHandle, goToBottomHandle, goToCommentHandle, sidebarMenuInit, sideBarToggleHandle } from '../components/sidebar'
 import {
   backToTop,
   goToComment,
@@ -18,6 +18,7 @@ export default async function domInit () {
   document.querySelectorAll('.overview .menu > .item').forEach((el) => {
     siteNav.querySelector('.menu').appendChild(el.cloneNode(true))
   })
+  sidebarMenuInit()
 
   loadCat.addEventListener('click', Loader.vanish)
   menuToggle.addEventListener('click', sideBarToggleHandle)
@@ -52,7 +53,7 @@ export default async function domInit () {
   // 侧边栏阴影控制
   // ==============================
 
-  const inner = document.querySelector('#sidebar .panels > .inner');
+  const inner = document.querySelector<HTMLElement>('#sidebar .panels > .inner');
   if (inner) {
     const updateShadows = () => {
       const scrollTop = inner.scrollTop;
@@ -62,7 +63,32 @@ export default async function domInit () {
       inner.classList.toggle('scroll-bottom', scrollTop < maxScroll);
     };
 
+    const normalizeWheelDelta = (event: WheelEvent) => {
+      if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return event.deltaY * 16
+      if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) return event.deltaY * inner.clientHeight
+      return event.deltaY
+    }
+    const absorbWheel = (event: WheelEvent) => {
+      event.preventDefault()
+      event.stopPropagation()
+      inner.scrollTop += normalizeWheelDelta(event)
+    }
+    let lastTouchY = 0
+    const rememberTouch = (event: TouchEvent) => {
+      lastTouchY = event.touches[0]?.clientY || 0
+    }
+    const absorbTouchMove = (event: TouchEvent) => {
+      const currentTouchY = event.touches[0]?.clientY || lastTouchY
+      event.preventDefault()
+      event.stopPropagation()
+      inner.scrollTop += lastTouchY - currentTouchY
+      lastTouchY = currentTouchY
+    }
+
     inner.addEventListener('scroll', updateShadows);
+    inner.addEventListener('wheel', absorbWheel, { passive: false })
+    inner.addEventListener('touchstart', rememberTouch, { passive: true })
+    inner.addEventListener('touchmove', absorbTouchMove, { passive: false })
     window.addEventListener('resize', updateShadows);
     updateShadows();
   }

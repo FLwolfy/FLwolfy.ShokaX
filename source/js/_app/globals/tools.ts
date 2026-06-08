@@ -23,7 +23,7 @@ export const showtip = (msg: string): void | never => {
 
 export const pagePosition = () => {
   // 判断配置项是否开启了自动记录滚动位置
-  if (CONFIG.auto_scroll) {
+  if (CONFIG.auto_scroll && LOCAL.ispost) {
     // 将当前页面的滚动位置存入本地缓存
     localStorage.setItem(LOCAL_URL, String(scrollAction.y))
   }
@@ -45,8 +45,10 @@ export const positionInit = (comment?: boolean) => {
     } catch (e) {
       target = null
     }
-  } else {
+  } else if (LOCAL.ispost) {
     target = CONFIG.auto_scroll ? parseInt(localStorage.getItem(LOCAL_URL)) : 0
+  } else {
+    localStorage.removeItem(LOCAL_URL)
   }
 
   if (target) {

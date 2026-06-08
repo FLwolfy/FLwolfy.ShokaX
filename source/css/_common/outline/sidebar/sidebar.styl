@@ -30,29 +30,37 @@
   >.inner {
     position: relative;
     width: $sidebar-desktop;
+    min-height: 100vh;
+    height: 100vh;
     color: var(--grey-6);
     text-align: center;
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: flex-start;
-    flex-wrap: wrap;
     z-index: $zindex-1;
   }
 }
 
 .panels {
-  padding: 4.6875rem 0 2rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 3.25rem 0 .75rem;
   width: 100%;
   overflow: hidden;
-  min-height: 100vh;
 
   .inner {
-    margin-top: 2.5rem;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: .75rem;
     overflow-x: hidden;
     overflow-y: auto;
+    overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     width: auto;
-    height: calc(100vh - 6.6875rem);
+    height: auto;
 
     box-shadow: none;
     transition: box-shadow 0.2s ease;
@@ -73,7 +81,7 @@
 
     +tablet-mobile() {
       box-shadow: none !important;
-      height: 100vh;
+      height: auto;
       margin-top: 0;
     }
 

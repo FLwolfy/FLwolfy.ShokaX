@@ -244,6 +244,24 @@ export const goToCommentHandle = () => {
   pageScroll(document.getElementById('comments'))
 }
 
+export const sidebarMenuInit = () => {
+  document.querySelectorAll<HTMLElement>('.overview .menu > .item.dropdown').forEach((item) => {
+    const toggle = item.querySelector(':scope > a')
+    if (!toggle || item.dataset.dropdownBound) return
+
+    item.dataset.dropdownBound = 'true'
+    toggle.addEventListener('click', (event) => {
+      event.preventDefault()
+
+      const expanded = item.classList.contains('expand')
+      item.parentElement?.querySelectorAll<HTMLElement>(':scope > .item.dropdown.expand').forEach((sibling) => {
+        if (sibling !== item) sibling.classList.remove('expand')
+      })
+      item.classList.toggle('expand', !expanded)
+    })
+  })
+}
+
 export const menuActive = () => {
   document.querySelectorAll('.menu .item:not(.title)').forEach((element) => {
     const target = <HTMLAnchorElement> element.querySelector('a[href]')

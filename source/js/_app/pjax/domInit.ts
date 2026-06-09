@@ -68,8 +68,8 @@ export default async function domInit () {
     }
     const hideOverscroll = () => {
       window.clearTimeout(hideOverscrollTimer)
-      inner.classList.remove('is-native-overscrolling')
       updateEdgeShadows()
+      inner.classList.remove('is-native-overscrolling')
     }
     const showOverscroll = () => {
       if (!isScrollable()) {

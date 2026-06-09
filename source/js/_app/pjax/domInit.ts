@@ -55,42 +55,83 @@ export default async function domInit () {
 
   const inner = document.querySelector<HTMLElement>('#sidebar .panels > .inner');
   if (inner) {
-    const updateShadows = () => {
-      const scrollTop = inner.scrollTop;
-      const maxScroll = inner.scrollHeight - inner.clientHeight;
-
-      inner.classList.toggle('scroll-top', scrollTop > 0);
-      inner.classList.toggle('scroll-bottom', scrollTop < maxScroll);
-    };
-
-    const normalizeWheelDelta = (event: WheelEvent) => {
-      if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return event.deltaY * 16
-      if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) return event.deltaY * inner.clientHeight
-      return event.deltaY
-    }
-    const absorbWheel = (event: WheelEvent) => {
-      event.preventDefault()
-      event.stopPropagation()
-      inner.scrollTop += normalizeWheelDelta(event)
-    }
+    let hideOverscrollTimer = 0
     let lastTouchY = 0
+
+    const isScrollable = () => inner.scrollHeight > inner.clientHeight + 1
+    const updateEdgeShadows = () => {
+      const maxScroll = Math.max(0, inner.scrollHeight - inner.clientHeight)
+      const scrollable = isScrollable()
+
+      inner.classList.toggle('scroll-top', scrollable && inner.scrollTop > 1)
+      inner.classList.toggle('scroll-bottom', scrollable && inner.scrollTop < maxScroll - 1)
+    }
+    const hideOverscroll = () => {
+      window.clearTimeout(hideOverscrollTimer)
+      inner.classList.remove('is-native-overscrolling')
+      updateEdgeShadows()
+    }
+    const showOverscroll = () => {
+      if (!isScrollable()) {
+        hideOverscroll()
+        return
+      }
+      inner.classList.add('is-native-overscrolling')
+      window.clearTimeout(hideOverscrollTimer)
+      hideOverscrollTimer = window.setTimeout(hideOverscroll, 180)
+    }
+    const observeScroll = () => {
+      const maxScroll = Math.max(0, inner.scrollHeight - inner.clientHeight)
+      if (isScrollable() && (inner.scrollTop < 0 || inner.scrollTop > maxScroll)) {
+        showOverscroll()
+      } else if (inner.scrollTop > 0 && inner.scrollTop < maxScroll) {
+        hideOverscroll()
+      } else {
+        updateEdgeShadows()
+      }
+    }
+    const observeWheel = (event: WheelEvent) => {
+      const maxScroll = Math.max(0, inner.scrollHeight - inner.clientHeight)
+      const atTop = inner.scrollTop <= 0
+      const atBottom = inner.scrollTop >= maxScroll
+
+      if (isScrollable() && ((atTop && event.deltaY < 0) || (atBottom && event.deltaY > 0))) {
+        showOverscroll()
+      } else {
+        hideOverscroll()
+      }
+    }
     const rememberTouch = (event: TouchEvent) => {
       lastTouchY = event.touches[0]?.clientY || 0
     }
-    const absorbTouchMove = (event: TouchEvent) => {
+    const observeTouch = (event: TouchEvent) => {
       const currentTouchY = event.touches[0]?.clientY || lastTouchY
-      event.preventDefault()
-      event.stopPropagation()
-      inner.scrollTop += lastTouchY - currentTouchY
+      const movement = currentTouchY - lastTouchY
+      const maxScroll = Math.max(0, inner.scrollHeight - inner.clientHeight)
+      const atTop = inner.scrollTop <= 0
+      const atBottom = inner.scrollTop >= maxScroll
+
       lastTouchY = currentTouchY
+      if (isScrollable() && ((atTop && movement > 0) || (atBottom && movement < 0))) {
+        showOverscroll()
+      } else {
+        hideOverscroll()
+      }
     }
 
-    inner.addEventListener('scroll', updateShadows);
-    inner.addEventListener('wheel', absorbWheel, { passive: false })
+    inner.addEventListener('scroll', observeScroll, { passive: true })
+    inner.addEventListener('wheel', observeWheel, { passive: true })
     inner.addEventListener('touchstart', rememberTouch, { passive: true })
-    inner.addEventListener('touchmove', absorbTouchMove, { passive: false })
-    window.addEventListener('resize', updateShadows);
-    updateShadows();
+    inner.addEventListener('touchmove', observeTouch, { passive: true })
+    inner.addEventListener('touchend', () => {
+      window.clearTimeout(hideOverscrollTimer)
+      hideOverscrollTimer = window.setTimeout(hideOverscroll, 350)
+    }, { passive: true })
+    const resizeObserver = new ResizeObserver(updateEdgeShadows)
+    inner.querySelectorAll('.panel').forEach((panel) => resizeObserver.observe(panel))
+    resizeObserver.observe(inner)
+    window.addEventListener('resize', updateEdgeShadows)
+    updateEdgeShadows()
   }
 
   // ==============================

@@ -9,11 +9,20 @@ type Point = {
   y: number
 }
 
+type WebKitGestureEvent = Event & {
+  scale: number
+  clientX: number
+  clientY: number
+}
+
 const MIN_SCALE = 0.1
 const MAX_SCALE = 5
 const DEFAULT_SCALE = 1
-const CLICK_ZOOM_SCALE = 2
+const CLICK_ZOOM_SCALE = 2.5
 const SCALE_STEP = 0.1
+const WHEEL_ZOOM_SPEED = 0.002
+const TRACKPAD_ZOOM_SPEED = 0.01
+const WHEEL_IDLE_DELAY = 120
 
 let images: ViewerImage[] = []
 let currentIndex = 0
@@ -38,6 +47,8 @@ let dragOrigin: Point = { x: 0, y: 0 }
 let translateOrigin: Point = { x: 0, y: 0 }
 let pinchDistance = 0
 let pinchScale = MIN_SCALE
+let gestureScale = DEFAULT_SCALE
+let wheelIdleTimer = 0
 const pointers = new Map<number, Point>()
 
 const isOpen = () => viewer?.classList.contains('is-open') === true
@@ -52,6 +63,8 @@ const applyTransform = () => {
 }
 
 const resetTransform = () => {
+  window.clearTimeout(wheelIdleTimer)
+  viewerImage?.classList.remove('is-pinching', 'is-wheel-zooming')
   scale = DEFAULT_SCALE
   translateX = 0
   translateY = 0
@@ -59,9 +72,7 @@ const resetTransform = () => {
 }
 
 const setScale = (nextScale: number, origin?: Point) => {
-  const boundedScale = Math.round(
-    Math.min(MAX_SCALE, Math.max(MIN_SCALE, nextScale)) * 100
-  ) / 100
+  const boundedScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, nextScale))
   if (boundedScale === scale) return
 
   if (origin && viewer) {
@@ -109,8 +120,10 @@ const closeViewer = () => {
 
   viewer.classList.remove('is-open')
   viewer.setAttribute('aria-hidden', 'true')
+  window.clearTimeout(wheelIdleTimer)
   pointers.clear()
   dragging = false
+  viewerImage?.classList.remove('is-dragging', 'is-pinching', 'is-wheel-zooming')
   window.clearTimeout(closeTimer)
   closeTimer = window.setTimeout(() => {
     if (viewer && !isOpen()) viewer.hidden = true
@@ -138,6 +151,15 @@ const getPointerDistance = () => {
   return Math.hypot(second.x - first.x, second.y - first.y)
 }
 
+const getPointerMidpoint = () => {
+  const [first, second] = [...pointers.values()]
+  if (!first || !second) return null
+  return {
+    x: (first.x + second.x) / 2,
+    y: (first.y + second.y) / 2
+  }
+}
+
 const handlePointerDown = (event: PointerEvent) => {
   if (!viewerImage || event.button !== 0) return
 
@@ -152,6 +174,8 @@ const handlePointerDown = (event: PointerEvent) => {
     if (dragging) viewerImage.classList.add('is-dragging')
   } else if (pointers.size === 2) {
     dragging = false
+    viewerImage.classList.add('is-pinching')
+    viewerImage.classList.remove('is-dragging')
     pinchDistance = getPointerDistance()
     pinchScale = scale
   }
@@ -162,7 +186,11 @@ const handlePointerMove = (event: PointerEvent) => {
   pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
 
   if (pointers.size === 2 && pinchDistance > 0) {
-    setScale(pinchScale * (getPointerDistance() / pinchDistance))
+    const midpoint = getPointerMidpoint()
+    setScale(
+      pinchScale * (getPointerDistance() / pinchDistance),
+      midpoint || undefined
+    )
     return
   }
   if (!dragging) return
@@ -182,11 +210,13 @@ const handlePointerUp = (event: PointerEvent) => {
 
   const remainingPointer = [...pointers.values()][0]
   if (remainingPointer) {
+    viewerImage?.classList.remove('is-pinching')
     dragging = scale > DEFAULT_SCALE
     dragOrigin = remainingPointer
     translateOrigin = { x: translateX, y: translateY }
     if (dragging) viewerImage?.classList.add('is-dragging')
   } else {
+    viewerImage?.classList.remove('is-pinching')
     dragging = false
     if (dragged) {
       suppressClick = true
@@ -267,16 +297,52 @@ const createViewer = () => {
       y: event.clientY
     })
   })
-  viewerImage?.addEventListener('wheel', (event) => {
+  viewer.addEventListener('wheel', (event) => {
     event.preventDefault()
-    setScale(scale + (event.deltaY < 0 ? SCALE_STEP : -SCALE_STEP), {
+
+    const target = event.target as HTMLElement
+    const overScaleButton = target.closest('.image-viewer__reset') !== null
+    if (!event.ctrlKey && !overScaleButton) return
+
+    const deltaModeMultiplier = event.deltaMode === WheelEvent.DOM_DELTA_LINE
+      ? 16
+      : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+        ? window.innerHeight
+        : 1
+    const direction = event.ctrlKey ? 1 : -1
+    const delta = Math.max(
+      -100,
+      Math.min(100, event.deltaY * deltaModeMultiplier * direction)
+    )
+    const speed = event.ctrlKey ? TRACKPAD_ZOOM_SPEED : WHEEL_ZOOM_SPEED
+
+    viewerImage?.classList.add('is-wheel-zooming')
+    window.clearTimeout(wheelIdleTimer)
+    wheelIdleTimer = window.setTimeout(() => {
+      viewerImage?.classList.remove('is-wheel-zooming')
+    }, WHEEL_IDLE_DELAY)
+
+    setScale(
+      scale * Math.exp(-delta * speed),
+      event.ctrlKey ? { x: event.clientX, y: event.clientY } : undefined
+    )
+  }, { passive: false })
+  viewer.addEventListener('gesturestart', ((event: WebKitGestureEvent) => {
+    event.preventDefault()
+    gestureScale = scale
+    viewerImage?.classList.add('is-pinching')
+  }) as EventListener, { passive: false })
+  viewer.addEventListener('gesturechange', ((event: WebKitGestureEvent) => {
+    event.preventDefault()
+    setScale(gestureScale * event.scale, {
       x: event.clientX,
       y: event.clientY
     })
-  }, { passive: false })
-  viewer.addEventListener('wheel', (event) => {
+  }) as EventListener, { passive: false })
+  viewer.addEventListener('gestureend', ((event: Event) => {
     event.preventDefault()
-  }, { passive: false })
+    viewerImage?.classList.remove('is-pinching')
+  }) as EventListener, { passive: false })
   viewerImage?.addEventListener('pointerdown', handlePointerDown)
   viewerImage?.addEventListener('pointermove', handlePointerMove)
   viewerImage?.addEventListener('pointerup', handlePointerUp)
